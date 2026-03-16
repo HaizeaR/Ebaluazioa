@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ikas-egoeren Ebaluazio Sistema · Ingurunearen Ezaguera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb;--surface:#fff;--border:#dde3ee;
+  --blue-hdr:#4A6FA5;--blue-mid:#6B93C9;--blue-pale:#dde3ee;--blue-zebra:#eef4f9;
+  --green-dark:#4E7C59;--green-mid:#7EC8A0;--green-pale:#d6f0e0;
+  --orange:#DF8C50;--peach:#fcd5a8;--peach-inp:#fff7ee;
+  --gray:#f2f2f2;--text:#1e2d3d;--muted:#7a8899;--white:#fff;
+  --fail-bg:#fde8e8;--fail-tx:#c0392b;
+  --warn-bg:#fef9e7;--warn-tx:#b7860b;
+  --pass-bg:#e8f8ef;--pass-tx:#1e7e4a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--blue-hdr);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;gap:16px;}
+.topbar-brand{display:flex;align-items:center;gap:12px;color:#fff;flex-shrink:0;}
+.topbar-brand h1{font-size:.95rem;font-weight:600;letter-spacing:-.01em;}
+.topbar-brand p{font-size:.7rem;opacity:.65;margin-top:1px;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:.8rem;color:rgba(255,255,255,.65);}
+.breadcrumb .sep{opacity:.4;}
+.breadcrumb .crumb{color:rgba(255,255,255,.65);cursor:pointer;padding:3px 0;}
+.breadcrumb .crumb:hover{color:#fff;}
+.breadcrumb .crumb.active{color:#fff;font-weight:500;cursor:default;}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.btn{font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;padding:6px 13px;border-radius:6px;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;transition:filter .12s,box-shadow .15s,background .12s;}
+.btn:active{filter:brightness(.93);}
+.btn-white{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);}
+.btn-white:hover{background:rgba(255,255,255,.25);}
+.btn-grn{background:var(--green-dark);color:#fff;box-shadow:0 2px 6px rgba(78,124,89,.3);}
+.btn-grn:hover{box-shadow:0 3px 12px rgba(78,124,89,.4);}
+.btn-sec{background:var(--surface);color:var(--blue-hdr);border:1.5px solid var(--blue-mid);}
+.btn-sec:hover{background:var(--blue-zebra);}
+.btn-sm{padding:5px 10px;font-size:.74rem;}
+.btn-ghost{background:none;border:none;color:var(--muted);padding:4px 8px;font-size:.78rem;cursor:pointer;border-radius:5px;}
+.btn-ghost:hover{background:var(--bg);color:var(--text);}
+.btn-danger{background:none;border:1px solid #f5c0c0;color:var(--fail-tx);padding:4px 9px;font-size:.74rem;border-radius:5px;cursor:pointer;}
+.btn-danger:hover{background:var(--fail-bg);}
+
+.content{max-width:1600px;margin:0 auto;padding:28px 28px 60px;}
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── HOME ── */
+.home-header{margin-bottom:28px;}
+.home-header h2{font-size:1.25rem;font-weight:600;color:var(--blue-hdr);margin-bottom:6px;}
+.home-header p{font-size:.85rem;color:var(--muted);}
+.home-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;padding:16px 20px;background:var(--surface);border-radius:10px;border:1px solid var(--border);}
+.meta-f{display:flex;flex-direction:column;gap:3px;}
+.meta-f label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.meta-f input{font-family:'DM Sans',sans-serif;font-size:.85rem;border:1.5px solid var(--border);border-radius:6px;padding:6px 10px;background:var(--surface);outline:none;min-width:160px;transition:border-color .15s;}
+.meta-f input:focus{border-color:var(--blue-mid);}
+
+.home-section-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;}
+.ie-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:32px;}
+.ie-card{background:var(--surface);border-radius:10px;border:1.5px solid var(--border);padding:18px;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative;overflow:hidden;}
+.ie-card:hover{border-color:var(--blue-mid);box-shadow:0 4px 16px rgba(74,111,165,.14);}
+.ie-card.has-data{border-left:4px solid var(--green-dark);}
+.ie-card.has-data:hover{border-color:var(--green-dark);}
+.ie-card-num{font-family:'DM Mono',monospace;font-size:.7rem;font-weight:500;color:var(--blue-hdr);background:var(--blue-pale);padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:10px;}
+.ie-card-name{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.3;}
+.ie-card-sub{font-size:.75rem;color:var(--muted);margin-bottom:12px;}
+.ie-card-stats{display:flex;gap:8px;}
+.ie-card-stat{flex:1;text-align:center;background:var(--bg);border-radius:6px;padding:6px 4px;}
+.ie-card-stat-val{font-family:'DM Mono',monospace;font-size:.9rem;font-weight:600;color:var(--blue-hdr);}
+.ie-card-stat-lbl{font-size:.62rem;color:var(--muted);}
+.ie-card-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;color:var(--blue-pale);transition:color .15s;}
+.ie-card:hover .ie-card-arrow{color:var(--blue-mid);}
+.ie-card-progress{height:3px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:12px;}
+.ie-card-progress-fill{height:100%;border-radius:2px;background:var(--green-dark);transition:width .4s;}
+
+/* Final card */
+.final-card{background:var(--blue-hdr);border-radius:10px;padding:20px 24px;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.final-card:hover{opacity:.92;}
+.final-card-left h3{font-size:1rem;font-weight:600;color:#fff;margin-bottom:4px;}
+.final-card-left p{font-size:.78rem;color:rgba(255,255,255,.65);}
+.final-card-stats{display:flex;gap:16px;}
+.final-card-stat{text-align:center;}
+.final-card-stat-val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:600;color:#fff;}
+.final-card-stat-lbl{font-size:.65rem;color:rgba(255,255,255,.6);}
+
+/* Ikasle list on home */
+.student-list-box{background:var(--surface);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:32px;}
+.student-list-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);}
+.student-list-header h3{font-size:.82rem;font-weight:600;}
+.student-list-header p{font-size:.72rem;color:var(--muted);}
+.student-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0;}
+.student-chip{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);font-size:.82rem;gap:8px;}
+.student-chip:nth-child(even){background:var(--blue-zebra);}
+.student-chip-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.student-chip button{background:none;border:none;color:#ccc;cursor:pointer;font-size:.9rem;padding:0 2px;line-height:1;flex-shrink:0;}
+.student-chip button:hover{color:var(--fail-tx);}
+.add-student-row{display:flex;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);}
+.add-student-row input[type=text]{font-family:'DM Sans',sans-serif;font-size:.83rem;border:1.5px solid var(--border);border-radius:6px;padding:6px 11px;outline:none;flex:1;max-width:280px;transition:border-color .15s;}
+.add-student-row input[type=text]:focus{border-color:var(--blue-mid);}
+
+/* ── IE DETAIL ── */
+.ie-detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
+.ie-detail-header h2{font-size:1.1rem;font-weight:600;color:var(--blue-hdr);margin-bottom:3px;}
+.ie-detail-header p{font-size:.78rem;color:var(--muted);}
+.sub-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px;}
+.sub-tab{font-size:.82rem;font-weight:500;padding:8px 18px;border:none;background:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s;}
+.sub-tab:hover{color:var(--blue-hdr);}
+.sub-tab.active{color:var(--blue-hdr);border-bottom-color:var(--blue-hdr);}
+.sub-view{display:none;}
+.sub-view.active{display:block;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:.74rem;color:var(--muted);}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.stat{background:var(--surface);border-radius:7px;padding:9px 15px;box-shadow:0 2px 8px rgba(74,111,165,.08);min-width:88px;}
+.stat .sl{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.stat .sv{font-family:'DM Mono',monospace;font-size:1.15rem;color:var(--blue-hdr);}
+.stat.sf .sv{color:var(--fail-tx);}
+.stat.sw .sv{color:var(--warn-tx);}
+.stat.sp .sv{color:var(--pass-tx);}
+
+/* ── TABLE ── */
+.wrap{background:var(--surface);border-radius:10px;box-shadow:0 2px 12px rgba(74,111,165,.09);overflow:hidden;overflow-x:auto;margin-bottom:16px;}
+table{border-collapse:collapse;width:max-content;}
+.sticky{position:sticky;left:0;z-index:8;}
+thead .sticky{z-index:12;}
+th{font-family:'DM Sans',sans-serif;font-weight:500;border:1px solid rgba(255,255,255,.2);white-space:nowrap;padding:5px 7px;font-size:.69rem;}
+.h-name{background:var(--blue-hdr);color:var(--white);min-width:160px;text-align:left;font-size:.72rem;}
+.h-ce-a{background:var(--blue-hdr);color:var(--white);text-align:center;}
+.h-ce-i{background:var(--blue-pale);color:var(--muted);text-align:center;}
+.h-pond-a{background:var(--blue-mid);color:var(--white);text-align:center;font-family:'DM Mono',monospace;font-size:.7rem;}
+.h-pond-i{background:var(--blue-pale);color:#aaa;text-align:center;}
+.h-ie-a{background:var(--green-dark);color:var(--white);text-align:center;}
+.h-ie-i{background:var(--gray);color:var(--muted);text-align:center;}
+.h-pi-a{background:var(--green-mid);color:var(--white);text-align:center;font-family:'DM Mono',monospace;font-size:.68rem;}
+.h-pi-i{background:var(--gray);color:#bbb;text-align:center;}
+.h-jard{background:var(--orange);color:var(--white);text-align:center;font-size:.72rem;padding:6px 10px;}
+.h-jard-cell{background:var(--peach);color:#7a4010;text-align:center;font-size:.66rem;white-space:normal;max-width:82px;line-height:1.3;padding:5px 4px;}
+.h-nie{background:var(--green-dark);color:var(--white);text-align:center;font-size:.65rem;}
+.h-nce-a{background:var(--blue-hdr);color:var(--white);text-align:center;font-size:.66rem;}
+.h-nce-i{background:var(--blue-pale);color:var(--muted);text-align:center;font-size:.66rem;}
+.h-azken{background:var(--blue-hdr);color:var(--white);text-align:center;font-size:.7rem;}
+.h-dash{background:var(--gray);color:#ccc;text-align:center;}
+tbody tr:nth-child(odd) td{background:var(--surface);}
+tbody tr:nth-child(even) td{background:var(--blue-zebra);}
+tbody tr:hover td{filter:brightness(.965);}
+tbody tr:nth-child(even) .sticky{background:var(--blue-zebra)!important;}
+tbody tr:nth-child(odd) .sticky{background:var(--surface)!important;}
+td{border:1px solid var(--border);height:38px;text-align:center;vertical-align:middle;padding:0 3px;}
+.td-name{font-weight:500;font-size:.84rem;padding:0 12px;text-align:left;min-width:160px;border-right:2px solid var(--blue-pale);white-space:nowrap;}
+input.g{font-family:'DM Mono',monospace;font-size:.84rem;font-weight:500;width:52px;height:30px;border:1.5px solid transparent;border-radius:5px;text-align:center;background:var(--peach-inp);color:#7a4010;outline:none;-moz-appearance:textfield;transition:border-color .15s,background .15s;}
+input.g::-webkit-outer-spin-button,input.g::-webkit-inner-spin-button{-webkit-appearance:none;}
+input.g:focus{border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(223,140,80,.18);}
+input.g.filled{background:var(--peach);border-color:var(--orange);}
+.a-ie{font-family:'DM Mono',monospace;font-size:.78rem;font-weight:500;color:#2d5a3d;background:var(--green-pale)!important;min-width:48px;}
+.a-ce{font-family:'DM Mono',monospace;font-size:.8rem;font-weight:600;min-width:52px;}
+.a-ce-i{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--muted);min-width:48px;}
+.a-azk{font-family:'DM Mono',monospace;font-size:.86rem;font-weight:700;min-width:58px;}
+.a-dash{color:#ccc;font-size:.7rem;}
+.fail{color:var(--fail-tx)!important;background:var(--fail-bg)!important;}
+.warn{color:var(--warn-tx)!important;background:var(--warn-bg)!important;}
+.pass{color:var(--pass-tx)!important;background:var(--pass-bg)!important;}
+
+/* ── LABURPENA CARDS ── */
+.lab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-bottom:24px;}
+.lab-card{background:var(--surface);border-radius:9px;box-shadow:0 2px 10px rgba(74,111,165,.09);overflow:hidden;}
+.lab-card-hdr{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.lab-card-hdr.ce-a{background:var(--blue-hdr);color:#fff;}
+.lab-card-hdr.ce-i{background:#edf0f7;color:var(--muted);}
+.lab-card-title{font-size:.8rem;font-weight:600;flex:1;}
+.lab-card-pond{font-family:'DM Mono',monospace;font-size:.78rem;background:rgba(255,255,255,.2);padding:2px 7px;border-radius:4px;}
+.lab-card-body{padding:12px 14px;}
+.lab-kpi-row{display:flex;gap:8px;margin-bottom:10px;}
+.lab-kpi{flex:1;text-align:center;background:var(--bg);border-radius:6px;padding:7px 4px;}
+.lab-kpi-val{font-family:'DM Mono',monospace;font-size:1.05rem;font-weight:600;margin-bottom:2px;}
+.lab-kpi-lbl{font-size:.63rem;color:var(--muted);}
+.lab-bar-row{margin-bottom:10px;}
+.lab-bar-label{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:3px;}
+.lab-bar-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.lab-bar-fill{height:100%;border-radius:3px;transition:width .5s;}
+.lab-dist{display:flex;gap:5px;margin-bottom:10px;}
+.lab-pill{flex:1;padding:4px 0;border-radius:5px;text-align:center;font-size:.68rem;font-weight:600;}
+.pill-p{background:var(--pass-bg);color:var(--pass-tx);}
+.pill-w{background:var(--warn-bg);color:var(--warn-tx);}
+.pill-f{background:var(--fail-bg);color:var(--fail-tx);}
+.lab-ie-section{border-top:1px solid var(--border);padding-top:9px;}
+.lab-ie-title{font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px;}
+.lab-ie-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.lab-ie-badge{font-size:.65rem;background:var(--green-pale);color:#2d5a3d;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace;min-width:36px;text-align:center;}
+.lab-ie-bar-track{flex:1;height:4px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.lab-ie-bar-fill{height:100%;border-radius:3px;}
+.lab-ie-val{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:600;min-width:30px;text-align:right;}
+
+/* ── FINAL VIEW ── */
+.final-section-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:24px 0 12px;}
+.final-table-wrap{background:var(--surface);border-radius:9px;box-shadow:0 2px 10px rgba(74,111,165,.09);overflow:hidden;overflow-x:auto;margin-bottom:8px;}
+.final-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.final-table th{background:var(--blue-hdr);color:#fff;padding:8px 12px;text-align:left;font-weight:500;font-size:.72rem;white-space:nowrap;}
+.final-table th:not(:first-child){text-align:center;}
+.final-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.final-table td:not(:first-child){text-align:center;font-family:'DM Mono',monospace;font-size:.8rem;}
+.final-table tr:last-child td{border-bottom:none;}
+.final-table tr:nth-child(even) td{background:var(--blue-zebra);}
+.final-table tr:hover td{filter:brightness(.97);}
+.rank-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);min-width:20px;}
+.rank-1{color:#B8860B;font-weight:700;}
+.rank-2{color:#888;font-weight:700;}
+.rank-3{color:#965a3e;font-weight:700;}
+.bar-cell{display:flex;align-items:center;gap:6px;justify-content:center;}
+.mini-bar{width:44px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;display:inline-block;}
+.mini-bar-fill{height:100%;border-radius:3px;display:block;}
+
+/* ── RES TABLE (laburpena) ── */
+.res-table-wrap{background:var(--surface);border-radius:9px;box-shadow:0 2px 10px rgba(74,111,165,.09);overflow:hidden;overflow-x:auto;}
+.res-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.res-table th{background:var(--blue-hdr);color:#fff;padding:8px 12px;text-align:left;font-weight:500;font-size:.72rem;white-space:nowrap;}
+.res-table th:not(:first-child){text-align:center;}
+.res-table td{padding:7px 12px;border-bottom:1px solid var(--border);}
+.res-table td:not(:first-child){text-align:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;}
+.res-table tr:last-child td{border-bottom:none;}
+.res-table tr:nth-child(even) td{background:var(--blue-zebra);}
+.res-table tr:hover td{filter:brightness(.97);}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green-dark);color:#fff;padding:8px 20px;border-radius:28px;font-size:.8rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.16);z-index:999;}
+#toast.show{opacity:1;}
+
+/* iOS safari fix: textarea hidden for copy export */
+#csv-area{position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div>
+      <h1>Ingurunearen Ezaguera</h1>
+      <p>Decreto 77/2023 · 6. Maila</p>
+    </div>
+    <span id="save-indicator" style="font-size:.68rem;color:rgba(255,255,255,.7);opacity:0;transition:opacity .4s;margin-left:4px;">● Gordeta</span>
+  </div>
+  <div class="breadcrumb" id="breadcrumb">
+    <span class="crumb active" onclick="goHome()">Hasiera</span>
+  </div>
+  <div class="topbar-right" id="topbar-right">
+    <button class="btn btn-grn btn-sm" onclick="exportCSV()">↓ CSV</button>
+  </div>
+</div>
+
+<!-- hidden textarea for iOS copy fallback -->
+<textarea id="csv-area" readonly></textarea>
+
+<div class="content">
+
+  <!-- ══ HOME ══ -->
+  <div id="view-home" class="view active">
+    <div class="home-header">
+      <h2>Ikas-egoeren Ebaluazio Sistema</h2>
+      <p>Ikasturte osorako ebaluazio tresna. Hautatu ikas-egoera bat hasteko.</p>
+    </div>
+
+    <div class="home-meta">
+      <div class="meta-f"><label>Maila / Taldea</label><input id="m-maila" placeholder="6.A…"></div>
+      <div class="meta-f"><label>Ikasturte</label><input id="m-ik" value="2024-2025"></div>
+      <div class="meta-f"><label>Irakaslea</label><input id="m-ira" placeholder="Izena…"></div>
+    </div>
+
+    <p class="home-section-title">Ikasleen zerrenda (9 ikas-egoeratan partekatua)</p>
+    <div class="student-list-box">
+      <div class="student-list-header">
+        <div>
+          <h3 id="student-count-label">22 ikasle</h3>
+          <p>Hemen egindako aldaketak ikas-egoera guztietan islatzen dira</p>
+        </div>
+      </div>
+      <div class="student-list-grid" id="student-list-grid"></div>
+      <div class="add-student-row">
+        <input type="text" id="new-student-inp" placeholder="Ikasle berriaren izena…" onkeydown="if(event.key==='Enter')addStudent()">
+        <button class="btn btn-sec btn-sm" onclick="addStudent()">+ Gehitu</button>
+      </div>
+    </div>
+
+    <p class="home-section-title">Ikas-egoeras</p>
+    <div class="ie-cards-grid" id="ie-cards-grid"></div>
+
+    <div class="final-card" onclick="openFinal()">
+      <div class="final-card-left">
+        <h3>★ Laburpen Orokorra</h3>
+        <p>Nota finala ikasle bakoitzarentzat — 9 ikas-egoeren batez bestekoa</p>
+      </div>
+      <div class="final-card-stats" id="final-card-stats">
+        <div class="final-card-stat"><div class="final-card-stat-val" id="fcs-avg">—</div><div class="final-card-stat-lbl">Batez bestekoa</div></div>
+        <div class="final-card-stat"><div class="final-card-stat-val" id="fcs-pass">—</div><div class="final-card-stat-lbl">Gaindituta</div></div>
+        <div class="final-card-stat"><div class="final-card-stat-val" id="fcs-fail">—</div><div class="final-card-stat-lbl">Gutxi gainditu</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ IE DETAIL (rendered dynamically) ══ -->
+  <div id="view-ie" class="view"></div>
+
+  <!-- ══ FINAL ══ -->
+  <div id="view-final" class="view">
+    <div class="ie-detail-header">
+      <div><h2>Laburpen Orokorra</h2><p>Ikasle bakoitzaren nota finala — 9 ikas-egoeren batez bestekoa</p></div>
+      <button class="btn btn-sec btn-sm" onclick="goHome()">← Itzuli</button>
+    </div>
+    <div class="stats-row" id="final-stats-row"></div>
+    <p class="final-section-title">Ikasleen notak</p>
+    <div class="final-table-wrap">
+      <table class="final-table">
+        <thead><tr id="final-thead"></tr></thead>
+        <tbody id="final-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+let STUDENTS = [
+  'Ane Etxeberria','Mikel Larrañaga','Leire Uribe','Jokin Zubiaurre',
+  'Naia Arrizabalaga','Unai Beloki','Amaia Goikoetxea','Iker Mendizabal',
+  'Maider Otaegi','Beñat Elorriaga','Itziar Garmendia','Xabier Txurruka',
+  'Laia Aizpurua','Gorka Intxausti','Saioa Aranburu','Haritz Olazabal'
+];
+
+const COLS_STD = [
+  {type:'dash'},{type:'dash'},{type:'dash'},{type:'auto-ce-i',key:'ce1'},
+  {type:'dash'},
+  {type:'inp',key:'a22a'},{type:'inp',key:'a22b'},
+  {type:'auto-ie',key:'ie22',src:[{key:'a22a',w:.4},{key:'a22b',w:.6}]},
+  {type:'inp',key:'a23a'},{type:'inp',key:'a23b'},
+  {type:'auto-ie',key:'ie23',src:[{key:'a23a',w:.5},{key:'a23b',w:.5}]},
+  {type:'dash'},
+  {type:'inp',key:'a25'},
+  {type:'auto-ie',key:'ie25',src:[{key:'a25',w:1}]},
+  {type:'auto-ce',key:'ce2',src:[{key:'ie22',w:.4},{key:'ie23',w:.3},{key:'ie25',w:.3}]},
+  {type:'dash'},{type:'dash'},{type:'dash'},{type:'dash'},{type:'auto-ce-i',key:'ce3'},
+  {type:'dash'},{type:'dash'},{type:'dash'},{type:'auto-ce-i',key:'ce4'},
+  {type:'inp',key:'a51a'},{type:'inp',key:'a51b'},
+  {type:'auto-ie',key:'ie51',src:[{key:'a51a',w:.4},{key:'a51b',w:.6}]},
+  {type:'inp',key:'a52'},
+  {type:'auto-ie',key:'ie52',src:[{key:'a52',w:1}]},
+  {type:'dash'},
+  {type:'inp',key:'a54a'},{type:'inp',key:'a54b'},
+  {type:'auto-ie',key:'ie54',src:[{key:'a54a',w:.5},{key:'a54b',w:.5}]},
+  {type:'auto-ce',key:'ce5',src:[{key:'ie51',w:.4},{key:'ie52',w:.3},{key:'ie54',w:.3}]},
+  {type:'dash'},{type:'dash'},{type:'auto-ce-i',key:'ce6'},
+  {type:'dash'},{type:'auto-ce-i',key:'ce7'},
+  {type:'dash'},{type:'dash'},{type:'dash'},{type:'auto-ce-i',key:'ce8'},
+  {type:'dash'},{type:'dash'},{type:'dash'},{type:'auto-ce-i',key:'ce9'},
+  {type:'auto-azk',key:'azken',src:[{key:'ce2',w:.5},{key:'ce5',w:.5}]}
+];
+
+const IKAS_EGOERAS = [
+  {id:'ie1',name:'Espazioko Bidaia',     sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie2',name:'Energia Kristalak',    sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie3',name:'Ikas-egoera 3',        sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie4',name:'Ikas-egoera 4',        sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie5',name:'Ikas-egoera 5',        sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie6',name:'Ikas-egoera 6',        sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie7',name:'Ikas-egoera 7',        sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie8',name:'Ikas-egoera 8',        sub:'KE2 · KE5',cols:COLS_STD},
+  {id:'ie9',name:'Ikas-egoera 9',        sub:'KE2 · KE5',cols:COLS_STD},
+];
+
+const ieData = {};
+const ieCells = {};
+IKAS_EGOERAS.forEach(ie=>{
+  ieData[ie.id] = STUDENTS.map(()=>({}));
+  ieCells[ie.id] = STUDENTS.map(()=>({}));
+});
+
+let currentIeId = null;
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function nStr(v){return v==null?'—':v.toFixed(2);}
+function colorHex(v){if(v==null)return'#aaa';if(v<5)return'#e57373';if(v<6)return'#f0b429';return'#48bb78';}
+function wAvg(store,src){let n=0,d=0;src.forEach(({key,w})=>{const v=store[key];if(v!=null){n+=v*w;d+=w;}});return d===0?null:n/d;}
+
+function computeAuto(ieId,si){
+  const store=ieData[ieId][si];
+  const auto={};
+  const cols=IKAS_EGOERAS.find(x=>x.id===ieId).cols;
+  cols.filter(c=>c.type==='auto-ie').forEach(col=>{auto[col.key]=wAvg(store,col.src);});
+  cols.filter(c=>c.type==='auto-ce').forEach(col=>{auto[col.key]=wAvg(auto,col.src);});
+  const azk=cols.find(c=>c.type==='auto-azk');
+  auto.azken=azk?wAvg(auto,azk.src):null;
+  return auto;
+}
+
+function setCell(ieId,si,key,val){
+  const td=ieCells[ieId][si][key]; if(!td) return;
+  td.classList.remove('fail','warn','pass');
+  if(val==null){td.textContent='—';return;}
+  td.textContent=val.toFixed(2);
+  if(val<5)td.classList.add('fail');
+  else if(val<6)td.classList.add('warn');
+  else td.classList.add('pass');
+}
+
+function recalc(ieId,si){
+  const auto=computeAuto(ieId,si);
+  const cols=IKAS_EGOERAS.find(x=>x.id===ieId).cols;
+  cols.filter(c=>c.type==='auto-ie').forEach(col=>setCell(ieId,si,col.key,auto[col.key]));
+  cols.filter(c=>c.type==='auto-ce').forEach(col=>setCell(ieId,si,col.key,auto[col.key]));
+  setCell(ieId,si,'azken',auto.azken);
+  Object.keys(auto).forEach(k=>{ieData[ieId][si]['_'+k]=auto[k];});
+  updateIEStats(ieId);
+  refreshHomeCard(ieId);
+}
+
+function getIEFinals(ieId){
+  return STUDENTS.map((_,si)=>ieData[ieId][si]['_azken']??null);
+}
+function getStudentFinal(si){
+  const notas=IKAS_EGOERAS.map(ie=>ieData[ie.id][si]['_azken']).filter(x=>x!=null);
+  return notas.length?notas.reduce((a,b)=>a+b,0)/notas.length:null;
+}
+
+// ═══════════════════════════════════════════════
+// TABLE BUILD
+// ═══════════════════════════════════════════════
+function buildTable(ieId){
+  const tbody=document.getElementById('tbody-'+ieId);
+  if(!tbody) return;
+  tbody.innerHTML='';
+  ieCells[ieId]=STUDENTS.map(()=>({}));
+  STUDENTS.forEach((name,si)=>{
+    const tr=document.createElement('tr');
+    const tdN=document.createElement('td');
+    tdN.className='td-name sticky';tdN.textContent=name;tr.appendChild(tdN);
+    IKAS_EGOERAS.find(x=>x.id===ieId).cols.forEach(col=>{
+      const td=document.createElement('td');
+      if(col.type==='inp'){
+        const inp=document.createElement('input');
+        inp.type='number';inp.min=0;inp.max=10;inp.step=0.1;
+        inp.className='g';inp.placeholder='—';
+        const saved=ieData[ieId][si][col.key];
+        if(saved!=null){inp.value=saved;inp.classList.add('filled');}
+        inp.addEventListener('input',()=>{
+          const v=inp.value===''?null:Math.min(10,Math.max(0,parseFloat(inp.value)));
+          ieData[ieId][si][col.key]=v;
+          inp.classList.toggle('filled',v!==null);
+          recalc(ieId,si);
+        });
+        inp.addEventListener('blur',()=>{
+          if(inp.value==='') return;
+          const raw=parseFloat(inp.value);
+          if(isNaN(raw)){inp.value='';ieData[ieId][si][col.key]=null;inp.classList.remove('filled');recalc(ieId,si);return;}
+          const c=Math.min(10,Math.max(0,Math.round(raw*10)/10));
+          inp.value=c;ieData[ieId][si][col.key]=c;inp.classList.add('filled');recalc(ieId,si);
+        });
+        td.appendChild(inp);
+      } else if(col.type==='auto-ie'){td.className='a-ie';td.textContent='—';ieCells[ieId][si][col.key]=td;}
+      else if(col.type==='auto-ce'){td.className='a-ce';td.textContent='—';ieCells[ieId][si][col.key]=td;}
+      else if(col.type==='auto-ce-i'){td.className='a-ce-i a-dash';td.textContent='—';}
+      else if(col.type==='auto-azk'){td.className='a-azk';td.textContent='—';ieCells[ieId][si][col.key]=td;}
+      else{td.className='a-dash';td.textContent='—';}
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  STUDENTS.forEach((_,si)=>recalc(ieId,si));
+}
+
+// ═══════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════
+function updateIEStats(ieId){
+  const finals=getIEFinals(ieId).filter(x=>x!=null);
+  const n=finals.length;
+  const els={tot:'s-tot-'+ieId,avg:'s-avg-'+ieId,pass:'s-pass-'+ieId,warn:'s-warn-'+ieId,fail:'s-fail-'+ieId};
+  Object.entries(els).forEach(([k,id])=>{const el=document.getElementById(id);if(el){
+    if(k==='tot'){el.textContent=STUDENTS.length;}
+    else if(!n){el.textContent='—';}
+    else if(k==='avg'){el.textContent=(finals.reduce((a,b)=>a+b,0)/n).toFixed(2);}
+    else if(k==='pass'){el.textContent=finals.filter(x=>x>=6).length;}
+    else if(k==='warn'){el.textContent=finals.filter(x=>x>=5&&x<6).length;}
+    else if(k==='fail'){el.textContent=finals.filter(x=>x<5).length;}
+  }});
+}
+
+// ═══════════════════════════════════════════════
+// HOME CARDS
+// ═══════════════════════════════════════════════
+function buildHomeCards(){
+  const grid=document.getElementById('ie-cards-grid');
+  grid.innerHTML='';
+  IKAS_EGOERAS.forEach((ie,idx)=>{
+    const div=document.createElement('div');
+    div.className='ie-card';
+    div.id='home-card-'+ie.id;
+    div.onclick=()=>openIE(ie.id);
+    div.innerHTML=`
+      <div class="ie-card-num">IE${idx+1}</div>
+      <div class="ie-card-name">${ie.name}</div>
+      <div class="ie-card-sub">${ie.sub}</div>
+      <div class="ie-card-stats" id="card-stats-${ie.id}">
+        <div class="ie-card-stat"><div class="ie-card-stat-val">—</div><div class="ie-card-stat-lbl">Batez best.</div></div>
+        <div class="ie-card-stat"><div class="ie-card-stat-val" style="color:var(--pass-tx)">—</div><div class="ie-card-stat-lbl">Gaindituta</div></div>
+        <div class="ie-card-stat"><div class="ie-card-stat-val" style="color:var(--fail-tx)">—</div><div class="ie-card-stat-lbl">Gutxi gainditu</div></div>
+      </div>
+      <div class="ie-card-progress"><div class="ie-card-progress-fill" id="card-prog-${ie.id}" style="width:0%"></div></div>
+      <span class="ie-card-arrow">›</span>`;
+    grid.appendChild(div);
+  });
+}
+
+function refreshHomeCard(ieId){
+  const finals=getIEFinals(ieId).filter(x=>x!=null);
+  const n=finals.length;
+  const statsEl=document.getElementById('card-stats-'+ieId);
+  const progEl=document.getElementById('card-prog-'+ieId);
+  const cardEl=document.getElementById('home-card-'+ieId);
+  if(!statsEl) return;
+  const avg=n?finals.reduce((a,b)=>a+b,0)/n:null;
+  const pass=finals.filter(x=>x>=6).length;
+  const fail=finals.filter(x=>x<5).length;
+  const filled=STUDENTS.reduce((acc,_,si)=>{
+    const ie=IKAS_EGOERAS.find(x=>x.id===ieId);
+    return acc+ie.cols.filter(c=>c.type==='inp'&&ieData[ieId][si][c.key]!=null).length;
+  },0);
+  const totalInp=STUDENTS.length*IKAS_EGOERAS.find(x=>x.id===ieId).cols.filter(c=>c.type==='inp').length;
+  const pct=totalInp?Math.round(filled/totalInp*100):0;
+  if(pct>0) cardEl.classList.add('has-data'); else cardEl.classList.remove('has-data');
+  if(progEl) progEl.style.width=pct+'%';
+  const divs=statsEl.querySelectorAll('.ie-card-stat-val');
+  if(divs[0]) divs[0].textContent=avg?avg.toFixed(2):'—';
+  if(divs[1]) divs[1].textContent=n?pass:'—';
+  if(divs[2]) divs[2].textContent=n?fail:'—';
+  refreshFinalCardStats();
+}
+
+function refreshFinalCardStats(){
+  const allAvg=STUDENTS.map((_,si)=>getStudentFinal(si)).filter(x=>x!=null);
+  const n=allAvg.length;
+  document.getElementById('fcs-avg').textContent=n?(allAvg.reduce((a,b)=>a+b,0)/n).toFixed(2):'—';
+  document.getElementById('fcs-pass').textContent=n?allAvg.filter(x=>x>=6).length:'—';
+  document.getElementById('fcs-fail').textContent=n?allAvg.filter(x=>x<5).length:'—';
+}
+
+// ═══════════════════════════════════════════════
+// STUDENT LIST
+// ═══════════════════════════════════════════════
+function renderStudentList(){
+  const grid=document.getElementById('student-list-grid');
+  grid.innerHTML='';
+  STUDENTS.forEach((name,si)=>{
+    const div=document.createElement('div');
+    div.className='student-chip';
+    div.innerHTML=`<span class="student-chip-name">${name}</span><button onclick="removeStudent(${si})" title="Ezabatu">×</button>`;
+    grid.appendChild(div);
+  });
+  document.getElementById('student-count-label').textContent=STUDENTS.length+' ikasle';
+}
+
+function addStudent(){
+  const inp=document.getElementById('new-student-inp');
+  const name=inp.value.trim();
+  if(!name) return;
+  STUDENTS.push(name);
+  IKAS_EGOERAS.forEach(ie=>{
+    ieData[ie.id].push({});
+    ieCells[ie.id].push({});
+  });
+  inp.value='';
+  renderStudentList();
+  if(currentIeId) buildTable(currentIeId);
+  toast(name+' gehitu da ✓');
+}
+
+function removeStudent(si){
+  if(!confirm(STUDENTS[si]+' ezabatu nahi duzu? Nota guztiak galduko dira.')) return;
+  STUDENTS.splice(si,1);
+  IKAS_EGOERAS.forEach(ie=>{
+    ieData[ie.id].splice(si,1);
+    ieCells[ie.id].splice(si,1);
+  });
+  renderStudentList();
+  if(currentIeId) buildTable(currentIeId);
+  IKAS_EGOERAS.forEach(ie=>refreshHomeCard(ie.id));
+  toast('Ikaslea ezabatu da.');
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+}
+
+function goHome(){
+  currentIeId=null;
+  showView('home');
+  document.getElementById('breadcrumb').innerHTML=`<span class="crumb active">Hasiera</span>`;
+  document.getElementById('topbar-right').style.display='none';
+}
+
+function openIE(ieId){
+  currentIeId=ieId;
+  const ie=IKAS_EGOERAS.find(x=>x.id===ieId);
+  const idx=IKAS_EGOERAS.indexOf(ie)+1;
+  const container=document.getElementById('view-ie');
+
+  if(!document.getElementById('tbody-'+ieId)){
+    container.innerHTML=`
+      <div class="ie-detail-header">
+        <div><h2>${ie.name}</h2><p>IE${idx} · ${ie.sub} · Ebaluazio Taula</p></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="clearIE('${ieId}')">Garbitu</button>
+          <button class="btn btn-sec btn-sm" onclick="goHome()">← Itzuli</button>
+        </div>
+      </div>
+      <div class="sub-tabs">
+        <button class="sub-tab active" id="sub-tab-${ieId}-taula" onclick="switchSubTab('${ieId}','taula')">Ebaluazio Taula</button>
+        <button class="sub-tab" id="sub-tab-${ieId}-lab" onclick="switchSubTab('${ieId}','lab')">Laburpena</button>
+      </div>
+      <div class="sub-view active" id="sub-view-${ieId}-taula">
+        <div class="legend">
+          <span class="leg"><span class="leg-dot" style="background:var(--peach)"></span>Nota sartu (0–10)</span>
+          <span class="leg"><span class="leg-dot" style="background:var(--green-pale);border:1px solid var(--green-mid)"></span>IE auto</span>
+          <span class="leg"><span class="leg-dot" style="background:var(--blue-hdr)"></span>KE / Azken auto</span>
+          <span class="leg"><span class="leg-dot" style="background:var(--fail-bg);border:1px solid #f5c0c0"></span>Gutxi gainditu (&lt;5)</span>
+          <span class="leg"><span class="leg-dot" style="background:var(--warn-bg);border:1px solid #f0d080"></span>Mugan (5–5.9)</span>
+          <span class="leg"><span class="leg-dot" style="background:var(--pass-bg);border:1px solid #90d8b0"></span>Gaindituta (≥6)</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat"><div class="sl">Ikasle kop.</div><div class="sv" id="s-tot-${ieId}">—</div></div>
+          <div class="stat"><div class="sl">Batez bestekoa</div><div class="sv" id="s-avg-${ieId}">—</div></div>
+          <div class="stat sp"><div class="sl">Gaindituta ≥6</div><div class="sv" id="s-pass-${ieId}">—</div></div>
+          <div class="stat sw"><div class="sl">Mugan 5–5.9</div><div class="sv" id="s-warn-${ieId}">—</div></div>
+          <div class="stat sf"><div class="sl">Gutxi gainditu (&lt;5)</div><div class="sv" id="s-fail-${ieId}">—</div></div>
+        </div>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="h-name sticky" rowspan="3" style="vertical-align:middle">KONPETENTZIA<br>ESPEZIFIKOA</th>
+                <th class="h-ce-i" colspan="4">KE1 &middot; Informazioa bilatu eta hautatu</th>
+                <th class="h-ce-a" colspan="11">KE2 &middot; Galdera zientifikoak planteatu <small style="opacity:.7">(50%)</small></th>
+                <th class="h-ce-i" colspan="5">KE3 &middot; Arazo-egoerak proiektuz ebatzi</th>
+                <th class="h-ce-i" colspan="4">KE4 &middot; Gorputza, emozioak eta osasuna</th>
+                <th class="h-ce-a" colspan="10">KE5 &middot; Inguruneko elementuak aztertu <small style="opacity:.7">(50%)</small></th>
+                <th class="h-ce-i" colspan="3">KE6 &middot; Giza esku-hartzea</th>
+                <th class="h-ce-i" colspan="2">KE7 &middot; Jarraitutasuna</th>
+                <th class="h-ce-i" colspan="4">KE8 &middot; Aniztasuna eta genero-berdintasuna</th>
+                <th class="h-ce-i" colspan="4">KE9 &middot; Parte-hartze demokratikoa</th>
+                <th class="h-azken" rowspan="3" style="vertical-align:middle;min-width:62px">AZKEN<br>NOTA</th>
+              </tr>
+              <tr>
+                <th class="h-pond-i" colspan="4">&#8212;</th>
+                <th class="h-pond-a" colspan="11">50%</th>
+                <th class="h-pond-i" colspan="5">&#8212;</th>
+                <th class="h-pond-i" colspan="4">&#8212;</th>
+                <th class="h-pond-a" colspan="10">50%</th>
+                <th class="h-pond-i" colspan="3">&#8212;</th>
+                <th class="h-pond-i" colspan="2">&#8212;</th>
+                <th class="h-pond-i" colspan="4">&#8212;</th>
+                <th class="h-pond-i" colspan="4">&#8212;</th>
+              </tr>
+              <tr>
+                <th class="h-ie-i">1.1</th><th class="h-ie-i">1.2</th><th class="h-ie-i">1.3</th><th class="h-nce-i">KE1</th>
+                <th class="h-ie-i">2.1</th>
+                <th class="h-ie-a" colspan="3">2.2 <small>(40%)</small></th>
+                <th class="h-ie-a" colspan="3">2.3 <small>(30%)</small></th>
+                <th class="h-ie-i">2.4</th>
+                <th class="h-ie-a" colspan="2">2.5 <small>(30%)</small></th>
+                <th class="h-nce-a">KE2</th>
+                <th class="h-ie-i">3.1</th><th class="h-ie-i">3.2</th><th class="h-ie-i">3.3</th><th class="h-ie-i">3.4</th><th class="h-nce-i">KE3</th>
+                <th class="h-ie-i">4.1</th><th class="h-ie-i">4.2</th><th class="h-ie-i">4.3</th><th class="h-nce-i">KE4</th>
+                <th class="h-ie-a" colspan="3">5.1 <small>(40%)</small></th>
+                <th class="h-ie-a" colspan="2">5.2 <small>(30%)</small></th>
+                <th class="h-ie-i">5.3</th>
+                <th class="h-ie-a" colspan="3">5.4 <small>(30%)</small></th>
+                <th class="h-nce-a">KE5</th>
+                <th class="h-ie-i">6.1</th><th class="h-ie-i">6.2</th><th class="h-nce-i">KE6</th>
+                <th class="h-ie-i">7.1</th><th class="h-nce-i">KE7</th>
+                <th class="h-ie-i">8.1</th><th class="h-ie-i">8.2</th><th class="h-ie-i">8.3</th><th class="h-nce-i">KE8</th>
+                <th class="h-ie-i">9.1</th><th class="h-ie-i">9.2</th><th class="h-ie-i">9.3</th><th class="h-nce-i">KE9</th>
+              </tr>
+              <tr>
+                <th class="h-jard sticky" style="left:0">JARDUERAK</th>
+                <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE1</th>
+                <th class="h-dash">&#8212;</th>
+                <th class="h-jard-cell">Galderen analisia<br><small>(40%)</small></th>
+                <th class="h-jard-cell">Hipotesiak idatzi<br><small>(60%)</small></th>
+                <th class="h-nie">IE 2.2</th>
+                <th class="h-jard-cell">Esperimentua<br><small>(50%)</small></th>
+                <th class="h-jard-cell">Txostena<br><small>(50%)</small></th>
+                <th class="h-nie">IE 2.3</th>
+                <th class="h-dash">&#8212;</th>
+                <th class="h-jard-cell">Aurkezpena<br><small>(100%)</small></th>
+                <th class="h-nie">IE 2.5</th>
+                <th class="h-nce-a" style="font-size:.6rem">NOTA KE2</th>
+                <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE3</th>
+                <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE4</th>
+                <th class="h-jard-cell">Mapa kontzept.<br><small>(40%)</small></th>
+                <th class="h-jard-cell">Azterketa kasua<br><small>(60%)</small></th>
+                <th class="h-nie">IE 5.1</th>
+                <th class="h-jard-cell">Konexio-diagrama<br><small>(100%)</small></th>
+                <th class="h-nie">IE 5.2</th>
+                <th class="h-dash">&#8212;</th>
+                <th class="h-jard-cell">Proiektua<br><small>(50%)</small></th>
+                <th class="h-jard-cell">Autoebal.<br><small>(50%)</small></th>
+                <th class="h-nie">IE 5.4</th>
+                <th class="h-nce-a" style="font-size:.6rem">NOTA KE5</th>
+                <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE6</th>
+                <th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE7</th>
+                <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE8</th>
+                <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
+                <th class="h-nce-i" style="font-size:.6rem">NOTA KE9</th>
+                <th class="h-azken" style="font-size:.6rem">AZKEN<br>NOTA</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-${ieId}"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sub-view" id="sub-view-${ieId}-lab">
+        <div class="lab-grid" id="lab-grid-${ieId}"></div>
+        <p style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;">Ikasle guztien nota-taula</p>
+        <div class="res-table-wrap">
+          <table class="res-table">
+            <thead><tr>
+              <th>Ikaslea</th><th>KE2 (50%)</th><th>KE5 (50%)</th>
+              <th>IE 2.2</th><th>IE 2.3</th><th>IE 2.5</th>
+              <th>IE 5.1</th><th>IE 5.2</th><th>IE 5.4</th>
+              <th>Azken Nota</th><th>Egoera</th>
+            </tr></thead>
+            <tbody id="res-tbody-${ieId}"></tbody>
+          </table>
+        </div>
+      </div>`;
+    buildTable(ieId);
+  }
+
+  showView('ie');
+  document.getElementById('breadcrumb').innerHTML=`
+    <span class="crumb" onclick="goHome()">Hasiera</span>
+    <span class="sep">›</span>
+    <span class="crumb active">IE${idx} — ${ie.name}</span>`;
+  document.getElementById('topbar-right').style.display='flex';
+}
+
+function switchSubTab(ieId,tab){
+  ['taula','lab'].forEach(t=>{
+    document.getElementById('sub-tab-'+ieId+'-'+t).classList.toggle('active',t===tab);
+    document.getElementById('sub-view-'+ieId+'-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='lab') buildLaburpena(ieId);
+}
+
+function openFinal(){
+  showView('final');
+  document.getElementById('breadcrumb').innerHTML=`
+    <span class="crumb" onclick="goHome()">Hasiera</span>
+    <span class="sep">›</span>
+    <span class="crumb active">Laburpen Orokorra</span>`;
+  document.getElementById('topbar-right').style.display='flex';
+  currentIeId=null;
+  buildFinalView();
+}
+
+// ═══════════════════════════════════════════════
+// LABURPENA
+// ═══════════════════════════════════════════════
+function buildLaburpena(ieId){
+  const KES=[
+    {ke:'KE2',ceKey:'ce2',label:'Galdera zientifikoak planteatu',pond:50,
+     ies:[{id:'ie22',label:'IE 2.2',pond:40},{id:'ie23',label:'IE 2.3',pond:30},{id:'ie25',label:'IE 2.5',pond:30}]},
+    {ke:'KE5',ceKey:'ce5',label:'Inguruneko elementuak aztertu',pond:50,
+     ies:[{id:'ie51',label:'IE 5.1',pond:40},{id:'ie52',label:'IE 5.2',pond:30},{id:'ie54',label:'IE 5.4',pond:30}]}
+  ];
+  const grid=document.getElementById('lab-grid-'+ieId);
+  if(!grid) return;
+  grid.innerHTML='';
+  KES.forEach(ke=>{
+    const v=STUDENTS.map((_,si)=>ieData[ieId][si]['_'+ke.ceKey]).filter(x=>x!=null);
+    const n=v.length,avg=n?v.reduce((a,b)=>a+b,0)/n:null;
+    const pass=v.filter(x=>x>=6).length,warn=v.filter(x=>x>=5&&x<6).length,fail=v.filter(x=>x<5).length;
+    let ieRows='<div class="lab-ie-section"><div class="lab-ie-title">IE bakoitzeko batez bestekoa</div>';
+    ke.ies.forEach(r=>{
+      const iv=STUDENTS.map((_,si)=>ieData[ieId][si]['_'+r.id]).filter(x=>x!=null);
+      const ia=iv.length?iv.reduce((a,b)=>a+b,0)/iv.length:null;
+      ieRows+=`<div class="lab-ie-row">
+        <span class="lab-ie-badge">${r.label}</span>
+        <span style="font-size:.64rem;color:var(--muted);min-width:26px">${r.pond}%</span>
+        <div class="lab-ie-bar-track"><div class="lab-ie-bar-fill" style="width:${ia!=null?ia*10:0}%;background:${colorHex(ia)}"></div></div>
+        <span class="lab-ie-val" style="color:${colorHex(ia)}">${nStr(ia)}</span>
+      </div>`;
+    });
+    ieRows+='</div>';
+    const card=document.createElement('div');
+    card.className='lab-card';
+    card.innerHTML=`
+      <div class="lab-card-hdr ce-a">
+        <span class="lab-card-title">${ke.ke} — ${ke.label}</span>
+        <span class="lab-card-pond">${ke.pond}%</span>
+      </div>
+      <div class="lab-card-body">
+        <div class="lab-kpi-row">
+          <div class="lab-kpi"><div class="lab-kpi-val" style="color:${colorHex(avg)}">${nStr(avg)}</div><div class="lab-kpi-lbl">Batez bestekoa</div></div>
+          <div class="lab-kpi"><div class="lab-kpi-val" style="color:var(--pass-tx)">${pass}</div><div class="lab-kpi-lbl">Gaindituta</div></div>
+          <div class="lab-kpi"><div class="lab-kpi-val" style="color:var(--fail-tx)">${fail}</div><div class="lab-kpi-lbl">Gutxi gainditu</div></div>
+          <div class="lab-kpi"><div class="lab-kpi-val">${n}</div><div class="lab-kpi-lbl">Ebaluatuak</div></div>
+        </div>
+        <div class="lab-bar-row">
+          <div class="lab-bar-label"><span>Batez bestekoa</span><span style="color:${colorHex(avg)};font-weight:600">${nStr(avg)} / 10</span></div>
+          <div class="lab-bar-track"><div class="lab-bar-fill" style="width:${avg!=null?avg*10:0}%;background:${colorHex(avg)}"></div></div>
+        </div>
+        ${n>0?`<div class="lab-dist">
+          <div class="lab-pill pill-p">✓ ${pass} gaindituta</div>
+          <div class="lab-pill pill-w">≈ ${warn} mugan</div>
+          <div class="lab-pill pill-f">✗ ${fail} gutxi gainditu</div>
+        </div>`:'<p style="font-size:.73rem;color:var(--muted)">Oraindik ez dago daturik.</p>'}
+        ${ieRows}
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  const tbody=document.getElementById('res-tbody-'+ieId);
+  if(!tbody) return;
+  tbody.innerHTML='';
+  STUDENTS.forEach((name,si)=>{
+    const d=ieData[ieId][si];
+    const f=k=>d['_'+k]!=null?d['_'+k].toFixed(2):'—';
+    const fc=k=>`color:${colorHex(d['_'+k]??null)}`;
+    const barCell=k=>{
+      const v=d['_'+k]??null;
+      if(v==null) return `<span style="color:var(--muted)">—</span>`;
+      return `<div class="bar-cell"><div class="mini-bar"><span class="mini-bar-fill" style="width:${v*10}%;background:${colorHex(v)}"></span></div><span style="${fc(k)}">${f(k)}</span></div>`;
+    };
+    const azk=d['_azken']??null;
+    let badge='—';
+    if(azk!=null) badge=azk>=6?`<span style="background:var(--pass-bg);color:var(--pass-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Gaindituta</span>`:azk>=5?`<span style="background:var(--warn-bg);color:var(--warn-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Mugan</span>`:`<span style="background:var(--fail-bg);color:var(--fail-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Gutxi gainditu</span>`;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:500;font-size:.82rem">${name}</td>
+      <td>${barCell('ce2')}</td><td>${barCell('ce5')}</td>
+      <td><span style="${fc('ie22')}">${f('ie22')}</span></td>
+      <td><span style="${fc('ie23')}">${f('ie23')}</span></td>
+      <td><span style="${fc('ie25')}">${f('ie25')}</span></td>
+      <td><span style="${fc('ie51')}">${f('ie51')}</span></td>
+      <td><span style="${fc('ie52')}">${f('ie52')}</span></td>
+      <td><span style="${fc('ie54')}">${f('ie54')}</span></td>
+      <td><span style="font-size:.88rem;font-weight:700;color:${colorHex(azk)};font-family:'DM Mono',monospace">${f('azken')}</span></td>
+      <td>${badge}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// FINAL VIEW
+// ═══════════════════════════════════════════════
+function buildFinalView(){
+  const rows=STUDENTS.map((name,si)=>{
+    const notas=IKAS_EGOERAS.map(ie=>ieData[ie.id][si]['_azken']??null);
+    const valid=notas.filter(x=>x!=null);
+    return{name,si,notas,avg:valid.length?valid.reduce((a,b)=>a+b,0)/valid.length:null};
+  });
+
+  const valid=rows.map(r=>r.avg).filter(x=>x!=null);
+  const n=valid.length;
+  const gAvg=n?valid.reduce((a,b)=>a+b,0)/n:null;
+  document.getElementById('final-stats-row').innerHTML=`
+    <div class="stat"><div class="sl">Ikasle kop.</div><div class="sv">${STUDENTS.length}</div></div>
+    <div class="stat"><div class="sl">Batez bestekoa</div><div class="sv" style="color:${colorHex(gAvg)}">${nStr(gAvg)}</div></div>
+    <div class="stat sp"><div class="sl">Gaindituta ≥6</div><div class="sv">${n?valid.filter(x=>x>=6).length:'—'}</div></div>
+    <div class="stat sw"><div class="sl">Mugan 5–5.9</div><div class="sv">${n?valid.filter(x=>x>=5&&x<6).length:'—'}</div></div>
+    <div class="stat sf"><div class="sl">Gutxi gainditu (&lt;5)</div><div class="sv">${n?valid.filter(x=>x<5).length:'—'}</div></div>
+    <div class="stat"><div class="sl">IE ebaluatuak</div><div class="sv">${IKAS_EGOERAS.filter(ie=>STUDENTS.some((_,si)=>ieData[ie.id][si]['_azken']!=null)).length}/9</div></div>`;
+
+  const thead=document.getElementById('final-thead');
+  thead.innerHTML=`<th>#</th><th>Ikaslea</th>${IKAS_EGOERAS.map((ie,i)=>`<th>IE${i+1}<br><small style="font-weight:400;opacity:.75">${ie.name}</small></th>`).join('')}<th>Batez bestekoa</th><th>Egoera</th>`;
+
+  const tbody=document.getElementById('final-tbody');
+  tbody.innerHTML='';
+  rows.forEach(({name,notas,avg},rank)=>{
+    const rankLabel=`<span class="rank-num">${rank+1}</span>`;
+    let badge='—';
+    if(avg!=null) badge=avg>=6?`<span style="background:var(--pass-bg);color:var(--pass-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Gaindituta</span>`:avg>=5?`<span style="background:var(--warn-bg);color:var(--warn-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Mugan</span>`:`<span style="background:var(--fail-bg);color:var(--fail-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Gutxi gainditu</span>`;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="text-align:center">${rankLabel}</td>
+      <td style="font-weight:500;font-size:.83rem">${name}</td>
+      ${notas.map(v=>`<td><span style="color:${colorHex(v)};font-family:'DM Mono',monospace">${nStr(v)}</span></td>`).join('')}
+      <td><span style="font-size:.92rem;font-weight:700;color:${colorHex(avg)};font-family:'DM Mono',monospace">${nStr(avg)}</span></td>
+      <td>${badge}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// CLEAR + EXPORT (iOS-compatible CSV)
+// ═══════════════════════════════════════════════
+function clearIE(ieId){
+  if(!confirm('Ikas-egoera honetako nota guztiak garbitu nahi dituzu?')) return;
+  STUDENTS.forEach((_,si)=>{ieData[ieId][si]={};});
+  buildTable(ieId);
+  refreshHomeCard(ieId);
+  toast('Notak garbitu dira ✓');
+}
+
+function buildCSVString(ieId){
+  const ie=IKAS_EGOERAS.find(x=>x.id===ieId);
+  const hdrs=['Ikaslea','KE2','KE5','IE2.2','IE2.3','IE2.5','IE5.1','IE5.2','IE5.4','Azken Nota'];
+  const rows=[hdrs,...STUDENTS.map((_,si)=>{
+    const d=ieData[ieId][si];
+    const f=k=>d['_'+k]!=null?d['_'+k].toFixed(2):'';
+    return[STUDENTS[si],f('ce2'),f('ce5'),f('ie22'),f('ie23'),f('ie25'),f('ie51'),f('ie52'),f('ie54'),f('azken')];
+  })];
+  return rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+}
+
+function exportCSV(){
+  const ieId=currentIeId;
+  if(!ieId){toast('Hautatu ikas-egoera bat lehenik.');return;}
+  const ie=IKAS_EGOERAS.find(x=>x.id===ieId);
+  const csvStr=buildCSVString(ieId);
+  const filename=ie.name.replace(/\s+/g,'_')+'.csv';
+
+  // Try standard download first (desktop / Android Chrome)
+  try {
+    const blob=new Blob(['\uFEFF'+csvStr],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=filename;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1000);
+    toast('CSV deskargatu da ✓');
+  } catch(e){
+    // iOS Safari fallback: open CSV in new tab (user can share/save from there)
+    iosCSVFallback(csvStr, filename);
+  }
+}
+
+function iosCSVFallback(csvStr, filename){
+  // Open as data URI in new tab — iOS lets user share/save it
+  const dataUri='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+csvStr);
+  const w=window.open(dataUri,'_blank');
+  if(w){
+    toast('CSV irekita — Partekatu / Gorde aukeratik deskargatu ✓');
+  } else {
+    // Last resort: show in textarea for manual copy
+    const ta=document.getElementById('csv-area');
+    ta.style.cssText='position:fixed;top:10%;left:5%;width:90%;height:70%;z-index:9999;background:#fff;border:2px solid #4A6FA5;border-radius:8px;padding:12px;font-size:.75rem;font-family:monospace;';
+    ta.value=csvStr;
+    ta.removeAttribute('readonly');
+    ta.focus();ta.select();
+    toast('Kopiatu testua eskuz ✓');
+    setTimeout(()=>{
+      ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none;';
+      ta.setAttribute('readonly','');
+    },12000);
+  }
+}
+
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
+
+// ═══════════════════════════════════════════════
+// PERSISTENTZIA — localStorage
+// ═══════════════════════════════════════════════
+const LS_KEY = 'ikas_egoera_data_v1';
+
+function saveToStorage(){
+  try {
+    // Only save raw input values (not computed _keys), plus students and meta
+    const payload = {
+      students: STUDENTS,
+      meta: {
+        maila: document.getElementById('m-maila').value,
+        ik: document.getElementById('m-ik').value,
+        ira: document.getElementById('m-ira').value,
+      },
+      grades: {}
+    };
+    IKAS_EGOERAS.forEach(ie=>{
+      payload.grades[ie.id] = STUDENTS.map((_,si)=>{
+        const d = ieData[ie.id][si];
+        const out = {};
+        ie.cols.filter(c=>c.type==='inp').forEach(c=>{
+          if(d[c.key]!=null) out[c.key]=d[c.key];
+        });
+        return out;
+      });
+    });
+    localStorage.setItem(LS_KEY, JSON.stringify(payload));
+    showSaveIndicator();
+  } catch(e){ console.warn('localStorage save failed', e); }
+}
+
+function loadFromStorage(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const payload = JSON.parse(raw);
+
+    // Restore students
+    if(payload.students && payload.students.length){
+      STUDENTS.length = 0;
+      payload.students.forEach(s=>STUDENTS.push(s));
+      // Resize ieData/ieCells arrays to match
+      IKAS_EGOERAS.forEach(ie=>{
+        ieData[ie.id] = STUDENTS.map(()=>({}));
+        ieCells[ie.id] = STUDENTS.map(()=>({}));
+      });
+    }
+
+    // Restore meta fields (after DOM ready)
+    if(payload.meta){
+      const m = payload.meta;
+      if(m.maila) document.getElementById('m-maila').value = m.maila;
+      if(m.ik)    document.getElementById('m-ik').value    = m.ik;
+      if(m.ira)   document.getElementById('m-ira').value   = m.ira;
+    }
+
+    // Restore grades
+    if(payload.grades){
+      IKAS_EGOERAS.forEach(ie=>{
+        const saved = payload.grades[ie.id];
+        if(!saved) return;
+        saved.forEach((rowData, si)=>{
+          if(si >= STUDENTS.length) return;
+          Object.assign(ieData[ie.id][si], rowData);
+        });
+      });
+    }
+    return true;
+  } catch(e){ console.warn('localStorage load failed', e); return false; }
+}
+
+// Autosave on meta field changes
+function hookMetaAutosave(){
+  ['m-maila','m-ik','m-ira'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>saveToStorage());
+  });
+}
+
+// Small save indicator in topbar brand area
+function showSaveIndicator(){
+  const el = document.getElementById('save-indicator');
+  if(!el) return;
+  el.textContent = '● Gordeta';
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.style.opacity='0'; }, 2000);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+// Wrap recalc to autosave after every grade recalculation
+const _recalcBase = recalc;
+recalc = function(ieId, si){
+  _recalcBase(ieId, si);
+  saveToStorage();
+};
+
+// Wrap clearIE to also save after clearing
+clearIE = function(ieId){
+  if(!confirm('Ikas-egoera honetako nota guztiak garbitu nahi dituzu?')) return;
+  STUDENTS.forEach((_,si)=>{ ieData[ieId][si]={}; });
+  buildTable(ieId);
+  refreshHomeCard(ieId);
+  saveToStorage();
+  toast('Notak garbitu dira ✓');
+};
+
+// Wrap removeStudent to save after deletion
+removeStudent = function(si){
+  if(!confirm(STUDENTS[si]+' ezabatu nahi duzu? Nota guztiak galduko dira.')) return;
+  STUDENTS.splice(si,1);
+  IKAS_EGOERAS.forEach(ie=>{
+    ieData[ie.id].splice(si,1);
+    ieCells[ie.id].splice(si,1);
+  });
+  renderStudentList();
+  if(currentIeId) buildTable(currentIeId);
+  IKAS_EGOERAS.forEach(ie=>refreshHomeCard(ie.id));
+  saveToStorage();
+  toast('Ikaslea ezabatu da.');
+};
+
+// Wrap addStudent to save after adding
+addStudent = function(){
+  const inp=document.getElementById('new-student-inp');
+  const name=inp.value.trim();
+  if(!name) return;
+  STUDENTS.push(name);
+  IKAS_EGOERAS.forEach(ie=>{
+    ieData[ie.id].push({});
+    ieCells[ie.id].push({});
+  });
+  inp.value='';
+  renderStudentList();
+  if(currentIeId) buildTable(currentIeId);
+  saveToStorage();
+  toast(name+' gehitu da ✓');
+};
+
+// Load saved data, then render
+loadFromStorage();
+renderStudentList();
+buildHomeCards();
+IKAS_EGOERAS.forEach(ie=>refreshHomeCard(ie.id));
+hookMetaAutosave();
+goHome();
+</script>
+</body>
+</html>
