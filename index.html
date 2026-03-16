@@ -229,6 +229,115 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
 
 /* iOS safari fix: textarea hidden for copy export */
 #csv-area{position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none;}
+
+/* ── CELL POPOVER ── */
+#cell-popover{position:fixed;z-index:400;background:var(--surface);border-radius:10px;box-shadow:0 8px 32px rgba(30,45,61,.22);border:1px solid var(--border);width:300px;display:none;flex-direction:column;overflow:hidden;}
+#cell-popover.open{display:flex;}
+.cpop-head{background:var(--blue-hdr);color:#fff;padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.cpop-head-info h4{font-size:.82rem;font-weight:600;margin-bottom:1px;}
+.cpop-head-info p{font-size:.68rem;opacity:.7;}
+.cpop-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:1rem;cursor:pointer;padding:0 2px;line-height:1;}
+.cpop-close:hover{color:#fff;}
+.cpop-body{padding:12px 14px;max-height:70vh;overflow-y:auto;}
+.cpop-manual{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.cpop-manual label{font-size:.72rem;font-weight:600;color:var(--muted);white-space:nowrap;}
+.cpop-manual input{font-family:'DM Mono',monospace;font-size:1rem;font-weight:600;width:72px;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;text-align:center;outline:none;-moz-appearance:textfield;color:#7a4010;background:var(--peach-inp);}
+.cpop-manual input::-webkit-outer-spin-button,.cpop-manual input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.cpop-manual input:focus{border-color:var(--orange);background:#fff;}
+.cpop-rub-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;}
+.cpop-no-rub{font-size:.75rem;color:var(--muted);font-style:italic;}
+.cpop-nota-row{display:flex;align-items:center;justify-content:space-between;background:var(--blue-zebra);border-radius:6px;padding:7px 10px;margin-bottom:10px;}
+.cpop-nota-row span{font-size:.7rem;color:var(--muted);}
+.cpop-nota-val{font-family:'DM Mono',monospace;font-size:1rem;font-weight:700;}
+/* reuse rub-indicator styles inside popover */
+#cell-popover .rub-levels{grid-template-columns:repeat(2,1fr);}
+
+#rubric-overlay{position:fixed;inset:0;background:rgba(30,45,61,.35);z-index:300;opacity:0;pointer-events:none;transition:opacity .25s;}
+#rubric-overlay.open{opacity:1;pointer-events:all;}
+#rubric-panel{position:fixed;top:0;right:-540px;width:520px;max-width:95vw;height:100vh;background:var(--surface);z-index:301;box-shadow:-4px 0 32px rgba(30,45,61,.18);display:flex;flex-direction:column;transition:right .28s cubic-bezier(.4,0,.2,1);}
+#rubric-panel.open{right:0;}
+.rpanel-head{background:var(--blue-hdr);color:#fff;padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0;}
+.rpanel-head-info{flex:1;}
+.rpanel-head-info h3{font-size:.95rem;font-weight:600;margin-bottom:3px;}
+.rpanel-head-info p{font-size:.72rem;opacity:.7;}
+.rpanel-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:5px 10px;font-size:.8rem;cursor:pointer;flex-shrink:0;}
+.rpanel-close:hover{background:rgba(255,255,255,.28);}
+.rpanel-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.rpanel-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:10px;text-align:center;}
+.rpanel-placeholder .big{font-size:2.5rem;}
+.rpanel-placeholder p{font-size:.82rem;}
+
+/* rubric content inside panel */
+.rub-section{margin-bottom:20px;}
+.rub-section-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.rub-indicator{background:var(--bg);border-radius:8px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border);}
+.rub-ind-head{background:var(--blue-hdr);color:#fff;padding:7px 12px;font-size:.78rem;font-weight:600;}
+.rub-ind-head span{font-family:'DM Mono',monospace;font-size:.68rem;opacity:.75;margin-right:6px;}
+.rub-sub{padding:8px 12px;border-bottom:1px solid var(--border);}
+.rub-sub:last-child{border-bottom:none;}
+.rub-sub-title{font-size:.73rem;font-weight:600;color:var(--text);margin-bottom:6px;}
+.rub-levels{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.rub-level{border-radius:5px;padding:5px 6px;font-size:.64rem;line-height:1.4;}
+.rub-level-lbl{font-weight:700;font-size:.6rem;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;}
+.lvl-1{background:var(--fail-bg);color:var(--fail-tx);}
+.lvl-2{background:var(--warn-bg);color:var(--warn-tx);}
+.lvl-3{background:var(--pass-bg);color:var(--pass-tx);}
+.lvl-4{background:#e8f0ff;color:#2a4a8a;}
+.rub-note{font-size:.69rem;color:var(--muted);background:var(--blue-zebra);border-radius:6px;padding:7px 10px;margin-top:8px;line-height:1.5;}
+.rub-act-btn{display:inline-flex;align-items:center;gap:5px;background:var(--green-pale);color:#2d5a3d;border:1px solid var(--green-mid);border-radius:6px;padding:4px 10px;font-size:.72rem;font-weight:600;cursor:pointer;margin:3px 3px 6px 0;transition:background .12s;}
+.rub-act-btn:hover{background:var(--green-mid);color:#fff;}
+.rub-act-btn.active{background:var(--green-dark);color:#fff;border-color:var(--green-dark);}
+
+/* ── TOOLTIPS ── */
+[data-tip]{position:relative;cursor:help;}
+[data-tip]::after{
+  content:attr(data-tip);
+  position:absolute;
+  bottom:calc(100% + 8px);
+  left:50%;
+  transform:translateX(-50%);
+  background:#1e2d3d;
+  color:#fff;
+  font-family:'DM Sans',sans-serif;
+  font-size:.72rem;
+  font-weight:400;
+  line-height:1.45;
+  padding:7px 11px;
+  border-radius:7px;
+  white-space:pre-line;
+  min-width:180px;
+  max-width:260px;
+  text-align:left;
+  box-shadow:0 4px 16px rgba(0,0,0,.22);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s;
+  z-index:200;
+}
+[data-tip]::before{
+  content:'';
+  position:absolute;
+  bottom:calc(100% + 2px);
+  left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;
+  border-top-color:#1e2d3d;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s;
+  z-index:200;
+}
+[data-tip]:hover::after,[data-tip]:hover::before{opacity:1;}
+/* shift tooltips that would go off-screen left */
+[data-tip].tip-left::after{left:0;transform:none;}
+[data-tip].tip-left::before{left:12px;transform:none;}
+[data-tip].tip-right::after{left:auto;right:0;transform:none;}
+[data-tip].tip-right::before{left:auto;right:12px;transform:none;}
+
+/* help badge on topbar */
+.help-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:.75rem;font-weight:700;cursor:help;border:1px solid rgba(255,255,255,.3);flex-shrink:0;}
+.help-badge::after{bottom:auto;top:calc(100% + 8px);}
+.help-badge::before{bottom:auto;top:calc(100% + 2px);border-top-color:transparent;border-bottom-color:#1e2d3d;}
 </style>
 </head>
 <body>
@@ -239,12 +348,14 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
       <h1>Ingurunearen Ezaguera</h1>
       <p>Decreto 77/2023 · 6. Maila</p>
     </div>
-    <span id="save-indicator" style="font-size:.68rem;color:rgba(255,255,255,.7);opacity:0;transition:opacity .4s;margin-left:4px;">● Gordeta</span>
+    <span id="save-indicator" style="font-size:.68rem;color:rgba(255,255,255,.7);opacity:0;transition:opacity .4s;margin-left:4px;"
+      data-tip="Datuak automatikoki gordetzen dira.&#10;Nabigatzaile berdinean irekitzen baduzu,&#10;notak berrezarriko dira.">● Gordeta</span>
   </div>
   <div class="breadcrumb" id="breadcrumb">
     <span class="crumb active" onclick="goHome()">Hasiera</span>
   </div>
   <div class="topbar-right" id="topbar-right">
+    <button class="btn btn-white btn-sm" onclick="openRubricPanel(currentIeId)">📋 Errubrika</button>
     <button class="btn btn-grn btn-sm" onclick="exportCSV()">↓ CSV</button>
   </div>
 </div>
@@ -252,13 +363,43 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
 <!-- hidden textarea for iOS copy fallback -->
 <textarea id="csv-area" readonly></textarea>
 
+<!-- ══ CELL POPOVER ══ -->
+<div id="cell-popover">
+  <div class="cpop-head">
+    <div class="cpop-head-info">
+      <h4 id="cpop-student"></h4>
+      <p id="cpop-act"></p>
+    </div>
+    <button class="cpop-close" onclick="closePopover()">✕</button>
+  </div>
+  <div class="cpop-body" id="cpop-body"></div>
+</div>
+
+<!-- ══ RUBRIC PANEL ══ -->
+<div id="rubric-overlay" onclick="closeRubricPanel()"></div>
+<div id="rubric-panel">
+  <div class="rpanel-head">
+    <div class="rpanel-head-info">
+      <h3 id="rpanel-title">Ebaluazio Errubrika</h3>
+      <p id="rpanel-sub">—</p>
+    </div>
+    <button class="rpanel-close" onclick="closeRubricPanel()">✕ Itxi</button>
+  </div>
+  <div class="rpanel-body" id="rpanel-body">
+    <div class="rpanel-placeholder">
+      <div class="big">📋</div>
+      <p>Hautatu jarduera bat errubrika ikusteko</p>
+    </div>
+  </div>
+</div>
+
 <div class="content">
 
   <!-- ══ HOME ══ -->
   <div id="view-home" class="view active">
     <div class="home-header">
       <h2>Ikas-egoeren Ebaluazio Sistema</h2>
-      <p>Ikasturte osorako ebaluazio tresna. Hautatu ikas-egoera bat hasteko.</p>
+      <p>Ikasturte osorako ebaluazio tresna. Hautatu ikas-egoera bat hasteko. <span data-tip="Nola erabili:&#10;1. Bete ikasleen zerrenda behean&#10;2. Hautatu ikas-egoera bat&#10;3. Sartu notak laranja zeluletan&#10;4. Notak automatikoki gordetzen dira&#10;5. Laburpen Orokorra ikusi azken notak" style="cursor:help;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--blue-pale);color:var(--blue-hdr);font-size:.72rem;font-weight:700;vertical-align:middle;">?</span></p>
     </div>
 
     <div class="home-meta">
@@ -267,7 +408,7 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
       <div class="meta-f"><label>Irakaslea</label><input id="m-ira" placeholder="Izena…"></div>
     </div>
 
-    <p class="home-section-title">Ikasleen zerrenda (9 ikas-egoeratan partekatua)</p>
+    <p class="home-section-title">Ikasleen zerrenda (9 ikas-egoeratan partekatua) <span data-tip="Zerrenda bakarra da 9 ikas-egoera guztientzat.&#10;Ikasle bat gehitu edo ezabatzen baduzu,&#10;aldaketa ikas-egoera guztietan islatzen da." style="cursor:help;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--border);color:var(--muted);font-size:.62rem;font-weight:700;vertical-align:middle;">?</span></p>
     <div class="student-list-box">
       <div class="student-list-header">
         <div>
@@ -430,6 +571,33 @@ function getStudentFinal(si){
 // ═══════════════════════════════════════════════
 // TABLE BUILD
 // ═══════════════════════════════════════════════
+
+// Map input key → IE activity key (for rubric lookup)
+const INP_TO_ACT = {
+  a22a:'ie22', a22b:'ie22',
+  a23a:'ie23', a23b:'ie23',
+  a25:'ie25',
+  a51a:'ie51', a51b:'ie51',
+  a52:'ie52',
+  a54a:'ie54', a54b:'ie54',
+};
+
+// Human-readable label per input key
+const INP_LABELS = {
+  a22a:'Galderen analisia (IE 2.2)',
+  a22b:'Hipotesiak idatzi (IE 2.2)',
+  a23a:'Esperimentua (IE 2.3)',
+  a23b:'Txostena (IE 2.3)',
+  a25: 'Aurkezpena (IE 2.5)',
+  a51a:'Mapa kontzept. (IE 5.1)',
+  a51b:'Azterketa kasua (IE 5.1)',
+  a52: 'Konexio-diagrama (IE 5.2)',
+  a54a:'Proiektua (IE 5.4)',
+  a54b:'Autoebaluazioa (IE 5.4)',
+};
+
+let _popIeId=null, _popSi=null, _popKey=null, _popInp=null;
+
 function buildTable(ieId){
   const tbody=document.getElementById('tbody-'+ieId);
   if(!tbody) return;
@@ -452,6 +620,11 @@ function buildTable(ieId){
           ieData[ieId][si][col.key]=v;
           inp.classList.toggle('filled',v!==null);
           recalc(ieId,si);
+          // sync popover manual input if open for same cell
+          if(_popIeId===ieId&&_popSi===si&&_popKey===col.key){
+            const mi=document.getElementById('cpop-manual-inp');
+            if(mi&&document.activeElement!==mi) mi.value=inp.value;
+          }
         });
         inp.addEventListener('blur',()=>{
           if(inp.value==='') return;
@@ -459,6 +632,11 @@ function buildTable(ieId){
           if(isNaN(raw)){inp.value='';ieData[ieId][si][col.key]=null;inp.classList.remove('filled');recalc(ieId,si);return;}
           const c=Math.min(10,Math.max(0,Math.round(raw*10)/10));
           inp.value=c;ieData[ieId][si][col.key]=c;inp.classList.add('filled');recalc(ieId,si);
+        });
+        // open popover on click (not on focus — avoids double trigger)
+        inp.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          openCellPopover(ieId, si, col.key, inp, td);
         });
         td.appendChild(inp);
       } else if(col.type==='auto-ie'){td.className='a-ie';td.textContent='—';ieCells[ieId][si][col.key]=td;}
@@ -472,6 +650,169 @@ function buildTable(ieId){
   });
   STUDENTS.forEach((_,si)=>recalc(ieId,si));
 }
+
+// ═══════════════════════════════════════════════
+// CELL POPOVER
+// ═══════════════════════════════════════════════
+function openCellPopover(ieId, si, key, inp, tdEl){
+  // close if same cell clicked again
+  if(_popIeId===ieId && _popSi===si && _popKey===key){
+    closePopover(); return;
+  }
+  _popIeId=ieId; _popSi=si; _popKey=key; _popInp=inp;
+
+  const pop = document.getElementById('cell-popover');
+  const actKey = INP_TO_ACT[key];
+  const actData = actKey ? RUBRICAS[ieId]?.actividades?.[actKey] : null;
+
+  // header
+  document.getElementById('cpop-student').textContent = STUDENTS[si];
+  document.getElementById('cpop-act').textContent = INP_LABELS[key] || key;
+
+  // body
+  const curVal = ieData[ieId][si][key];
+  let html = '';
+
+  // manual note input
+  html += `<div class="cpop-manual">
+    <label>Nota eskuz:</label>
+    <input id="cpop-manual-inp" type="number" min="0" max="10" step="0.1"
+      value="${curVal!=null?curVal:''}" placeholder="0–10"
+      oninput="onPopoverManualInput()"
+      onblur="onPopoverManualBlur()">
+    <span style="font-size:.7rem;color:var(--muted);">/ 10</span>
+  </div>`;
+
+  if(actData){
+    const rubNota = calcRubNota(ieId, actKey, si);
+    const levels  = getRubLevels(ieId, actKey)[si] || {};
+
+    html += `<div class="cpop-rub-title">Errubrika — ${actData.label}</div>`;
+    html += `<div class="cpop-nota-row">
+      <span>Errubrikatik kalkulatutako nota</span>
+      <span class="cpop-nota-val" id="cpop-rub-nota" style="color:${colorHex(rubNota)}">${rubNota!=null?rubNota.toFixed(2):'—'}</span>
+    </div>`;
+
+    actData.indicadores.forEach(ind=>{
+      html += `<div class="rub-indicator">
+        <div class="rub-ind-head"><span>${ind.id}</span>${ind.title}</div>`;
+      ind.subs.forEach(sub=>{
+        const sel = levels[sub.id]||0;
+        html += `<div class="rub-sub">
+          <div class="rub-sub-title">${sub.id} — ${sub.title}</div>
+          <div class="rub-levels">`;
+        sub.levels.forEach((lv,i)=>{
+          const lvNum=i+1; const active=sel===lvNum;
+          html+=`<div class="rub-level lvl-${lvNum}${active?' rub-level-sel':''}"
+            style="cursor:pointer;${active?'outline:2px solid currentColor;outline-offset:1px;font-weight:600;':''}"
+            onclick="popSelectLevel('${ieId}','${actKey}',${si},'${sub.id}',${lvNum})">
+            <div class="rub-level-lbl">${lv.lbl}${active?' ✓':''}</div>${lv.txt}
+          </div>`;
+        });
+        html+=`</div></div>`;
+      });
+      html+=`</div>`;
+    });
+  } else {
+    html += `<p class="cpop-no-rub">Jarduera honentzat ez dago errubrikarik.</p>`;
+  }
+
+  document.getElementById('cpop-body').innerHTML = html;
+
+  // position popover near the cell
+  positionPopover(tdEl);
+  pop.classList.add('open');
+}
+
+function positionPopover(tdEl){
+  const pop = document.getElementById('cell-popover');
+  const rect = tdEl.getBoundingClientRect();
+  const pw = 300, ph = Math.min(500, window.innerHeight * 0.75);
+  pop.style.maxHeight = ph + 'px';
+
+  let left = rect.right + 8;
+  if(left + pw > window.innerWidth - 8) left = rect.left - pw - 8;
+  if(left < 8) left = 8;
+
+  let top = rect.top;
+  if(top + ph > window.innerHeight - 8) top = window.innerHeight - ph - 8;
+  if(top < 8) top = 8;
+
+  pop.style.left = left + 'px';
+  pop.style.top  = top  + 'px';
+}
+
+function onPopoverManualInput(){
+  const mi = document.getElementById('cpop-manual-inp');
+  if(!mi||_popInp===null) return;
+  const v = mi.value===''?null:Math.min(10,Math.max(0,parseFloat(mi.value)));
+  ieData[_popIeId][_popSi][_popKey] = v;
+  _popInp.value = v!=null?v:'';
+  _popInp.classList.toggle('filled', v!==null);
+  recalc(_popIeId, _popSi);
+}
+
+function onPopoverManualBlur(){
+  const mi = document.getElementById('cpop-manual-inp');
+  if(!mi) return;
+  if(mi.value==='') return;
+  const raw=parseFloat(mi.value);
+  if(isNaN(raw)){mi.value='';ieData[_popIeId][_popSi][_popKey]=null;_popInp.value='';_popInp.classList.remove('filled');recalc(_popIeId,_popSi);return;}
+  const c=Math.min(10,Math.max(0,Math.round(raw*10)/10));
+  mi.value=c; _popInp.value=c;
+  ieData[_popIeId][_popSi][_popKey]=c;
+  _popInp.classList.add('filled');
+  recalc(_popIeId,_popSi);
+}
+
+function popSelectLevel(ieId, actKey, si, subId, lvNum){
+  const rows = getRubLevels(ieId, actKey);
+  if(!rows[si]) rows[si]={};
+  rows[si][subId] = rows[si][subId]===lvNum ? undefined : lvNum;
+  if(rows[si][subId]===undefined) delete rows[si][subId];
+  applyRubNotaToTable(ieId, actKey, si);
+  saveRubLevels();
+  // refresh popover rubric section and manual input
+  const nota = calcRubNota(ieId, actKey, si);
+  const notaEl = document.getElementById('cpop-rub-nota');
+  if(notaEl){ notaEl.textContent=nota!=null?nota.toFixed(2):'—'; notaEl.style.color=colorHex(nota); }
+  const mi = document.getElementById('cpop-manual-inp');
+  if(mi){ const v=ieData[ieId][si][_popKey]; mi.value=v!=null?v:''; }
+  if(_popInp){ const v=ieData[ieId][si][_popKey]; _popInp.value=v!=null?v:''; _popInp.classList.toggle('filled',v!=null); }
+  // re-render rubric levels only
+  const act=RUBRICAS[ieId]?.actividades?.[actKey];
+  if(!act) return;
+  const levels=getRubLevels(ieId,actKey)[si]||{};
+  act.indicadores.forEach(ind=>{
+    ind.subs.forEach(sub=>{
+      const sel=levels[sub.id]||0;
+      const container=document.getElementById('cpop-body');
+      if(!container) return;
+      container.querySelectorAll('.rub-sub').forEach(subEl=>{
+        const titleEl=subEl.querySelector('.rub-sub-title');
+        if(!titleEl||!titleEl.textContent.startsWith(sub.id)) return;
+        subEl.querySelectorAll('.rub-level').forEach((lvEl,i)=>{
+          const lvNum=i+1; const active=sel===lvNum;
+          lvEl.className=`rub-level lvl-${lvNum}${active?' rub-level-sel':''}`;
+          lvEl.style.cssText=active?'cursor:pointer;outline:2px solid currentColor;outline-offset:1px;font-weight:600;':'cursor:pointer;';
+          const lbl=lvEl.querySelector('.rub-level-lbl');
+          if(lbl) lbl.textContent=act.indicadores.flatMap(i=>i.subs).find(s=>s.id===sub.id)?.levels[i]?.lbl+(active?' ✓':'');
+        });
+      });
+    });
+  });
+}
+
+function closePopover(){
+  document.getElementById('cell-popover').classList.remove('open');
+  _popIeId=null;_popSi=null;_popKey=null;_popInp=null;
+}
+
+// close popover on outside click
+document.addEventListener('click', e=>{
+  const pop=document.getElementById('cell-popover');
+  if(pop.classList.contains('open') && !pop.contains(e.target)) closePopover();
+});
 
 // ═══════════════════════════════════════════════
 // STATS
@@ -646,24 +987,26 @@ function openIE(ieId){
           <table>
             <thead>
               <tr>
-                <th class="h-name sticky" rowspan="3" style="vertical-align:middle">KONPETENTZIA<br>ESPEZIFIKOA</th>
+                <th class="h-name sticky" rowspan="3" style="vertical-align:middle"
+                  data-tip="Zutabe grisak: ikas-egoera honetan ebaluatu gabe.&#10;Zutabe berdeak: KE honen barruko IE nota.&#10;Zutabe urdinak: KE nota automatikoa (pisatua).">KONPETENTZIA<br>ESPEZIFIKOA</th>
                 <th class="h-ce-i" colspan="4">KE1 &middot; Informazioa bilatu eta hautatu</th>
-                <th class="h-ce-a" colspan="11">KE2 &middot; Galdera zientifikoak planteatu <small style="opacity:.7">(50%)</small></th>
+                <th class="h-ce-a" colspan="11" data-tip="KE2 — Galdera zientifikoak planteatu&#10;Azken notaren %50 osatzen du.&#10;IE 2.2 (40%) + IE 2.3 (30%) + IE 2.5 (30%)&#10;= KE2 nota automatikoa.">KE2 &middot; Galdera zientifikoak planteatu <small style="opacity:.7">(50%)</small></th>
                 <th class="h-ce-i" colspan="5">KE3 &middot; Arazo-egoerak proiektuz ebatzi</th>
                 <th class="h-ce-i" colspan="4">KE4 &middot; Gorputza, emozioak eta osasuna</th>
-                <th class="h-ce-a" colspan="10">KE5 &middot; Inguruneko elementuak aztertu <small style="opacity:.7">(50%)</small></th>
+                <th class="h-ce-a" colspan="10" data-tip="KE5 — Inguruneko elementuak aztertu&#10;Azken notaren %50 osatzen du.&#10;IE 5.1 (40%) + IE 5.2 (30%) + IE 5.4 (30%)&#10;= KE5 nota automatikoa.">KE5 &middot; Inguruneko elementuak aztertu <small style="opacity:.7">(50%)</small></th>
                 <th class="h-ce-i" colspan="3">KE6 &middot; Giza esku-hartzea</th>
                 <th class="h-ce-i" colspan="2">KE7 &middot; Jarraitutasuna</th>
                 <th class="h-ce-i" colspan="4">KE8 &middot; Aniztasuna eta genero-berdintasuna</th>
                 <th class="h-ce-i" colspan="4">KE9 &middot; Parte-hartze demokratikoa</th>
-                <th class="h-azken" rowspan="3" style="vertical-align:middle;min-width:62px">AZKEN<br>NOTA</th>
+                <th class="h-azken" rowspan="3" style="vertical-align:middle;min-width:62px"
+                  data-tip="Azken nota automatikoa:&#10;KE2 × 50% + KE5 × 50%&#10;&#10;6 edo gehiago = Gaindituta&#10;5–5.9 = Mugan&#10;5 baino gutxiago = Gutxi gainditu">AZKEN<br>NOTA</th>
               </tr>
               <tr>
                 <th class="h-pond-i" colspan="4">&#8212;</th>
-                <th class="h-pond-a" colspan="11">50%</th>
+                <th class="h-pond-a" colspan="11" data-tip="KE2 azken notaren %50 da">50%</th>
                 <th class="h-pond-i" colspan="5">&#8212;</th>
                 <th class="h-pond-i" colspan="4">&#8212;</th>
-                <th class="h-pond-a" colspan="10">50%</th>
+                <th class="h-pond-a" colspan="10" data-tip="KE5 azken notaren %50 da">50%</th>
                 <th class="h-pond-i" colspan="3">&#8212;</th>
                 <th class="h-pond-i" colspan="2">&#8212;</th>
                 <th class="h-pond-i" colspan="4">&#8212;</th>
@@ -672,52 +1015,53 @@ function openIE(ieId){
               <tr>
                 <th class="h-ie-i">1.1</th><th class="h-ie-i">1.2</th><th class="h-ie-i">1.3</th><th class="h-nce-i">KE1</th>
                 <th class="h-ie-i">2.1</th>
-                <th class="h-ie-a" colspan="3">2.2 <small>(40%)</small></th>
-                <th class="h-ie-a" colspan="3">2.3 <small>(30%)</small></th>
+                <th class="h-ie-a" colspan="3" data-tip="IE 2.2 — KE2 barruan %40 pisatzen du&#10;2 nota sartu: Galderen analisia eta Hipotesiak">2.2 <small>(40%)</small></th>
+                <th class="h-ie-a" colspan="3" data-tip="IE 2.3 — KE2 barruan %30 pisatzen du&#10;2 nota sartu: Esperimentua eta Txostena">2.3 <small>(30%)</small></th>
                 <th class="h-ie-i">2.4</th>
-                <th class="h-ie-a" colspan="2">2.5 <small>(30%)</small></th>
-                <th class="h-nce-a">KE2</th>
+                <th class="h-ie-a" colspan="2" data-tip="IE 2.5 — KE2 barruan %30 pisatzen du&#10;1 nota sartu: Aurkezpena">2.5 <small>(30%)</small></th>
+                <th class="h-nce-a" data-tip="KE2 nota automatikoa&#10;IE2.2×40% + IE2.3×30% + IE2.5×30%">KE2</th>
                 <th class="h-ie-i">3.1</th><th class="h-ie-i">3.2</th><th class="h-ie-i">3.3</th><th class="h-ie-i">3.4</th><th class="h-nce-i">KE3</th>
                 <th class="h-ie-i">4.1</th><th class="h-ie-i">4.2</th><th class="h-ie-i">4.3</th><th class="h-nce-i">KE4</th>
-                <th class="h-ie-a" colspan="3">5.1 <small>(40%)</small></th>
-                <th class="h-ie-a" colspan="2">5.2 <small>(30%)</small></th>
+                <th class="h-ie-a" colspan="3" data-tip="IE 5.1 — KE5 barruan %40 pisatzen du&#10;2 nota sartu: Mapa kontzeptuala eta Azterketa kasua">5.1 <small>(40%)</small></th>
+                <th class="h-ie-a" colspan="2" data-tip="IE 5.2 — KE5 barruan %30 pisatzen du&#10;1 nota sartu: Konexio-diagrama">5.2 <small>(30%)</small></th>
                 <th class="h-ie-i">5.3</th>
-                <th class="h-ie-a" colspan="3">5.4 <small>(30%)</small></th>
-                <th class="h-nce-a">KE5</th>
+                <th class="h-ie-a" colspan="3" data-tip="IE 5.4 — KE5 barruan %30 pisatzen du&#10;2 nota sartu: Proiektua eta Autoebaluazioa">5.4 <small>(30%)</small></th>
+                <th class="h-nce-a" data-tip="KE5 nota automatikoa&#10;IE5.1×40% + IE5.2×30% + IE5.4×30%">KE5</th>
                 <th class="h-ie-i">6.1</th><th class="h-ie-i">6.2</th><th class="h-nce-i">KE6</th>
                 <th class="h-ie-i">7.1</th><th class="h-nce-i">KE7</th>
                 <th class="h-ie-i">8.1</th><th class="h-ie-i">8.2</th><th class="h-ie-i">8.3</th><th class="h-nce-i">KE8</th>
                 <th class="h-ie-i">9.1</th><th class="h-ie-i">9.2</th><th class="h-ie-i">9.3</th><th class="h-nce-i">KE9</th>
               </tr>
               <tr>
-                <th class="h-jard sticky" style="left:0">JARDUERAK</th>
+                <th class="h-jard sticky" style="left:0"
+                  data-tip="Nota sartu: 0tik 10era&#10;Zelula laranjak: zuk sartutako notak&#10;Zelula berdeak: IE nota (automatikoa)&#10;Zelula urdinak: KE nota (automatikoa)">JARDUERAK</th>
                 <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
                 <th class="h-nce-i" style="font-size:.6rem">NOTA KE1</th>
                 <th class="h-dash">&#8212;</th>
-                <th class="h-jard-cell">Galderen analisia<br><small>(40%)</small></th>
-                <th class="h-jard-cell">Hipotesiak idatzi<br><small>(60%)</small></th>
-                <th class="h-nie">IE 2.2</th>
-                <th class="h-jard-cell">Esperimentua<br><small>(50%)</small></th>
-                <th class="h-jard-cell">Txostena<br><small>(50%)</small></th>
-                <th class="h-nie">IE 2.3</th>
+                <th class="h-jard-cell" data-tip="Galderen analisia&#10;IE 2.2 notaren %40&#10;0–10 arteko nota sartu">Galderen analisia<br><small>(40%)</small></th>
+                <th class="h-jard-cell" data-tip="Hipotesiak idatzi&#10;IE 2.2 notaren %60&#10;0–10 arteko nota sartu">Hipotesiak idatzi<br><small>(60%)</small></th>
+                <th class="h-nie" data-tip="IE 2.2 nota automatikoa&#10;Galderen analisia×40% + Hipotesiak×60%">IE 2.2</th>
+                <th class="h-jard-cell" data-tip="Esperimentua&#10;IE 2.3 notaren %50&#10;0–10 arteko nota sartu">Esperimentua<br><small>(50%)</small></th>
+                <th class="h-jard-cell" data-tip="Txostena&#10;IE 2.3 notaren %50&#10;0–10 arteko nota sartu">Txostena<br><small>(50%)</small></th>
+                <th class="h-nie" data-tip="IE 2.3 nota automatikoa&#10;Esperimentua×50% + Txostena×50%">IE 2.3</th>
                 <th class="h-dash">&#8212;</th>
-                <th class="h-jard-cell">Aurkezpena<br><small>(100%)</small></th>
-                <th class="h-nie">IE 2.5</th>
-                <th class="h-nce-a" style="font-size:.6rem">NOTA KE2</th>
+                <th class="h-jard-cell" data-tip="Aurkezpena&#10;IE 2.5 notaren %100&#10;0–10 arteko nota sartu">Aurkezpena<br><small>(100%)</small></th>
+                <th class="h-nie" data-tip="IE 2.5 nota automatikoa&#10;Aurkezpena×100%">IE 2.5</th>
+                <th class="h-nce-a" style="font-size:.6rem" data-tip="KE2 nota automatikoa&#10;IE2.2×40% + IE2.3×30% + IE2.5×30%&#10;Azken notaren %50 da">NOTA KE2</th>
                 <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
                 <th class="h-nce-i" style="font-size:.6rem">NOTA KE3</th>
                 <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
                 <th class="h-nce-i" style="font-size:.6rem">NOTA KE4</th>
-                <th class="h-jard-cell">Mapa kontzept.<br><small>(40%)</small></th>
-                <th class="h-jard-cell">Azterketa kasua<br><small>(60%)</small></th>
-                <th class="h-nie">IE 5.1</th>
-                <th class="h-jard-cell">Konexio-diagrama<br><small>(100%)</small></th>
-                <th class="h-nie">IE 5.2</th>
+                <th class="h-jard-cell" data-tip="Mapa kontzeptuala&#10;IE 5.1 notaren %40&#10;0–10 arteko nota sartu">Mapa kontzept.<br><small>(40%)</small></th>
+                <th class="h-jard-cell" data-tip="Azterketa kasua&#10;IE 5.1 notaren %60&#10;0–10 arteko nota sartu">Azterketa kasua<br><small>(60%)</small></th>
+                <th class="h-nie" data-tip="IE 5.1 nota automatikoa&#10;Mapa kontzept.×40% + Azterketa kasua×60%">IE 5.1</th>
+                <th class="h-jard-cell" data-tip="Konexio-diagrama&#10;IE 5.2 notaren %100&#10;0–10 arteko nota sartu">Konexio-diagrama<br><small>(100%)</small></th>
+                <th class="h-nie" data-tip="IE 5.2 nota automatikoa&#10;Konexio-diagrama×100%">IE 5.2</th>
                 <th class="h-dash">&#8212;</th>
-                <th class="h-jard-cell">Proiektua<br><small>(50%)</small></th>
-                <th class="h-jard-cell">Autoebal.<br><small>(50%)</small></th>
-                <th class="h-nie">IE 5.4</th>
-                <th class="h-nce-a" style="font-size:.6rem">NOTA KE5</th>
+                <th class="h-jard-cell" data-tip="Proiektua&#10;IE 5.4 notaren %50&#10;0–10 arteko nota sartu">Proiektua<br><small>(50%)</small></th>
+                <th class="h-jard-cell" data-tip="Autoebaluazioa&#10;IE 5.4 notaren %50&#10;0–10 arteko nota sartu">Autoebal.<br><small>(50%)</small></th>
+                <th class="h-nie" data-tip="IE 5.4 nota automatikoa&#10;Proiektua×50% + Autoebaluazioa×50%">IE 5.4</th>
+                <th class="h-nce-a" style="font-size:.6rem" data-tip="KE5 nota automatikoa&#10;IE5.1×40% + IE5.2×30% + IE5.4×30%&#10;Azken notaren %50 da">NOTA KE5</th>
                 <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
                 <th class="h-nce-i" style="font-size:.6rem">NOTA KE6</th>
                 <th class="h-dash">&#8212;</th>
@@ -726,7 +1070,7 @@ function openIE(ieId){
                 <th class="h-nce-i" style="font-size:.6rem">NOTA KE8</th>
                 <th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th><th class="h-dash">&#8212;</th>
                 <th class="h-nce-i" style="font-size:.6rem">NOTA KE9</th>
-                <th class="h-azken" style="font-size:.6rem">AZKEN<br>NOTA</th>
+                <th class="h-azken" style="font-size:.6rem" data-tip="Azken nota automatikoa&#10;KE2×50% + KE5×50%">AZKEN<br>NOTA</th>
               </tr>
             </thead>
             <tbody id="tbody-${ieId}"></tbody>
@@ -987,7 +1331,8 @@ function saveToStorage(){
         ik: document.getElementById('m-ik').value,
         ira: document.getElementById('m-ira').value,
       },
-      grades: {}
+      grades: {},
+      rubLevelsData: {}
     };
     IKAS_EGOERAS.forEach(ie=>{
       payload.grades[ie.id] = STUDENTS.map((_,si)=>{
@@ -997,6 +1342,11 @@ function saveToStorage(){
           if(d[c.key]!=null) out[c.key]=d[c.key];
         });
         return out;
+      });
+      // save rubric levels per activity
+      payload.rubLevelsData[ie.id] = {};
+      Object.entries(rubLevels[ie.id]).forEach(([actKey, rows])=>{
+        payload.rubLevelsData[ie.id][actKey] = rows.map(r=>({...r}));
       });
     });
     localStorage.setItem(LS_KEY, JSON.stringify(payload));
@@ -1040,6 +1390,18 @@ function loadFromStorage(){
         });
       });
     }
+
+    // Restore rubric levels
+    if(payload.rubLevelsData){
+      IKAS_EGOERAS.forEach(ie=>{
+        const savedRub = payload.rubLevelsData[ie.id];
+        if(!savedRub) return;
+        Object.entries(savedRub).forEach(([actKey, rows])=>{
+          rubLevels[ie.id][actKey] = STUDENTS.map((_,si) => rows[si] ? {...rows[si]} : {});
+        });
+      });
+    }
+
     return true;
   } catch(e){ console.warn('localStorage load failed', e); return false; }
 }
@@ -1114,6 +1476,430 @@ addStudent = function(){
   saveToStorage();
   toast(name+' gehitu da ✓');
 };
+
+// ═══════════════════════════════════════════════
+// ERRUBRIKA DATUAK
+// ═══════════════════════════════════════════════
+const RUBRICAS = {
+
+  'ie1': {
+    name: 'Espazioko Bidaia',
+    actividades: {
+
+      'ie22': {
+        label: 'IE 2.2 — Galderen analisia eta Hipotesiak',
+        ke: 'KE2 · Galdera zientifikoak planteatu',
+        marco: 'Decreto 77/2023 · LOMLOE · RD 157/2022',
+        nota: 'IE 2.2 nota: Galderen analisia (%40) + Hipotesiak (%60). Bi azpijarduerak modu independentean ebaluatzen dira.',
+        indicadores: [
+          {
+            id: '2.2.1',
+            title: 'Galdera zientifikoen analisia',
+            subs: [
+              {
+                id: '2.2.1a',
+                title: 'Galdera zientifikoak identifikatu eta sailkatu',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez du bereizten galdera zientifikoa galdera arruntetik. Sailkapen okerrak edo hutsik.' },
+                  { lbl: 'Garatzen', txt: 'Galdera zientifikoak identifikatzen ditu baina sailkapena partzial edo oso oinarrizkoa da.' },
+                  { lbl: 'Bereganatua', txt: 'Galdera zientifikoak identifikatu eta egoki sailkatzen ditu irizpide argietan oinarrituz.' },
+                  { lbl: 'Aurreratua', txt: 'Galdera zientifikoak identifikatu, sailkatu eta haien izaera zientifikoa argudiatzen du zehaztasunez.' },
+                ]
+              },
+              {
+                id: '2.2.1b',
+                title: 'Galdera ikergarrien ezaugarriak aztertu',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez ditu aipatzen galdera ikergarriaren ezaugarriak edo nahasten ditu.' },
+                  { lbl: 'Garatzen', txt: 'Ezaugarri bat edo bi aipatzen ditu, baina azalpena osatugabea da.' },
+                  { lbl: 'Bereganatua', txt: 'Galdera ikergarriaren ezaugarri nagusiak (neurgarritasuna, behaketa, ebidentzia) identifikatzen ditu.' },
+                  { lbl: 'Aurreratua', txt: 'Ezaugarriak identifikatu eta galdera zehatzak hobetzeko proposamenak egiten ditu arrazoiak emanez.' },
+                ]
+              }
+            ]
+          },
+          {
+            id: '2.2.2',
+            title: 'Hipotesien formulazioa',
+            subs: [
+              {
+                id: '2.2.2a',
+                title: 'Hipotesia idatzi: egitura eta argitasuna',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez du hipotesirik idazten edo formulazioa ez da ulertzen.' },
+                  { lbl: 'Garatzen', txt: 'Hipotesia idazten du baina egitura okerrekoa edo oso laburra da (kausa-efektu lotura falta).' },
+                  { lbl: 'Bereganatua', txt: 'Hipotesia "Baldin… orduan…" egiturarekin idazten du, kausa-efektu lotura argiarekin.' },
+                  { lbl: 'Aurreratua', txt: 'Hipotesia egoki idatzi eta aldagai independente/dependentea bereiztuz justifikatzen du.' },
+                ]
+              },
+              {
+                id: '2.2.2b',
+                title: 'Hipotesia: lotura galderarekin eta ikergarritasuna',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Hipotesiak ez du loturarik galderarekin edo ezin da egiaztatu.' },
+                  { lbl: 'Garatzen', txt: 'Hipotesia galderarekin lotuta dago partzialki baina ikergarritasuna zalantzan dago.' },
+                  { lbl: 'Bereganatua', txt: 'Hipotesia galderari erantzuten dio eta modu enpirikoan egiaztagarria da.' },
+                  { lbl: 'Aurreratua', txt: 'Hipotesia galderari erantzun eta zer nolako froga beharko litzatekeen azaltzen du argitasunez.' },
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      'ie23': {
+        label: 'IE 2.3 — Esperimentua eta Txostena',
+        ke: 'KE2 · Galdera zientifikoak planteatu',
+        marco: 'Decreto 77/2023 · LOMLOE · RD 157/2022',
+        nota: 'IE 2.3 nota: Esperimentua (%50) + Txostena (%50). Ikerketa-prozesuaren burutzapena eta komunikazioa ebaluatzen dira.',
+        indicadores: [
+          {
+            id: '2.3.1',
+            title: 'Esperimentuaren diseinua eta burutzapena',
+            subs: [
+              {
+                id: '2.3.1a',
+                title: 'Prozedura: aldagaiak kontrolatu eta behaketa sistematikoa',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez ditu aldagaiak bereizten. Behaketa ausazkoa edo daturik ez.' },
+                  { lbl: 'Garatzen', txt: 'Aldagairen bat identifikatzen du baina kontrola ez da sistematikoa. Datuak partzialak.' },
+                  { lbl: 'Bereganatua', txt: 'Aldagai independente eta dependentea bereizten ditu eta behaketa sistematikoki erregistratzen du.' },
+                  { lbl: 'Aurreratua', txt: 'Aldagaiak kontrolatu, behaketa sistematikoa egin eta sortutako datuen fidagarritasuna ebaluatzen du.' },
+                ]
+              },
+              {
+                id: '2.3.1b',
+                title: 'Emaitzak interpretatu eta hipotesiarekin alderatu',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez ditu emaitzak interpretatzen edo hipotesiarekin ez du loturarik egiten.' },
+                  { lbl: 'Garatzen', txt: 'Emaitzak deskribatzen ditu baina hipotesiarekin alderatzea ez da argia.' },
+                  { lbl: 'Bereganatua', txt: 'Emaitzak interpretatzen ditu eta hipotesia baieztatzen edo ezeztatzen du arrazoiekin.' },
+                  { lbl: 'Aurreratua', txt: 'Emaitzak interpretatu, hipotesiarekin alderatu eta ondorioak testuinguru zabalagoan kokatzen ditu.' },
+                ]
+              }
+            ]
+          },
+          {
+            id: '2.3.2',
+            title: 'Txostena: egitura eta komunikazioa',
+            subs: [
+              {
+                id: '2.3.2a',
+                title: 'Txostenaren egitura zientifikoa',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Txostenari egitura zientifikorik ez zaio nabari. Atalak nahasiak edo falta.' },
+                  { lbl: 'Garatzen', txt: 'Atal nagusiak agertzen dira (galdera, hipotesia, emaitzak) baina ez dago koherentziarik.' },
+                  { lbl: 'Bereganatua', txt: 'Txostenak egitura zientifikoa jarraitzen du: galdera, hipotesia, metodoa, emaitzak, ondorioak.' },
+                  { lbl: 'Aurreratua', txt: 'Egitura zientifiko osoa eta koherentea, elementu grafiko egokiekin (taulak, grafikoak) lagunduta.' },
+                ]
+              },
+              {
+                id: '2.3.2b',
+                title: 'Hizkuntza zientifikoa eta zehaztasuna',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez du terminologia zientifikorik erabiltzen. Idazketa ez da ulergarria.' },
+                  { lbl: 'Garatzen', txt: 'Terminologia zientifiko oinarrizkoa erabiltzen du baina ez betiere egoki.' },
+                  { lbl: 'Bereganatua', txt: 'Hizkuntza zientifikoa zehatza eta egokia da. Kontzeptuak ondo definituta.' },
+                  { lbl: 'Aurreratua', txt: 'Hizkuntza zientifiko aberatsa, zehatza eta koherentea. Terminologia espezializatua egoki erabilita.' },
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      'ie25': {
+        label: 'IE 2.5 — Aurkezpena',
+        ke: 'KE2 · Galdera zientifikoak planteatu',
+        marco: 'Decreto 77/2023 · LOMLOE · RD 157/2022',
+        nota: 'IE 2.5 nota: Aurkezpena (%100). Ikerketa-prozesuaren komunikazio ahozkoa eta bisualaren kalitatea ebaluatzen da.',
+        indicadores: [
+          {
+            id: '2.5.1',
+            title: 'Edukiaren komunikazioa',
+            subs: [
+              {
+                id: '2.5.1a',
+                title: 'Ikerketa-prozesua azaldu: argitasuna eta ordena',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Azalpena ez da ulergarria. Prozesua ez du azaltzen edo nahasita dago.' },
+                  { lbl: 'Garatzen', txt: 'Prozesua partzialki azaltzen du baina ordena edo argitasun falta du.' },
+                  { lbl: 'Bereganatua', txt: 'Ikerketa-prozesua (galdera, hipotesia, emaitzak, ondorioak) argiro eta ordenatuta azaltzen du.' },
+                  { lbl: 'Aurreratua', txt: 'Prozesua modu bikainean azaldu eta galderak edo zalantzak erantzuteko gai da.' },
+                ]
+              },
+              {
+                id: '2.5.1b',
+                title: 'Ondorioak komunikatu eta ikusleekin lotura',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ez ditu ondorioak komunikatzen edo ikusleekin kontakturik ez du egiten.' },
+                  { lbl: 'Garatzen', txt: 'Ondorioak aipatzen ditu baina komunikazioa mekanikoa da, ikusleekin lotura gutxi.' },
+                  { lbl: 'Bereganatua', txt: 'Ondorioak argi eta ulergarri komunikatzen ditu, ikusleekin begirune-kontaktua mantenduz.' },
+                  { lbl: 'Aurreratua', txt: 'Ondorioak modu erakargarrian komunikatu, ikusleen galderak aurreikusi eta erantzuten ditu.' },
+                ]
+              }
+            ]
+          },
+          {
+            id: '2.5.2',
+            title: 'Baliabide bisualak eta ahozko komunikazioa',
+            subs: [
+              {
+                id: '2.5.2a',
+                title: 'Material bisualaren kalitatea eta egokitasuna',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Material bisualik ez dago edo ez da batere egokia aurkezpenerako.' },
+                  { lbl: 'Garatzen', txt: 'Material bisuala badago baina informazioa iluna, gainkargaturik edo txiki.' },
+                  { lbl: 'Bereganatua', txt: 'Material bisuala argia, ordenatuak eta aurkezpena laguntzen du modu egokian.' },
+                  { lbl: 'Aurreratua', txt: 'Material bisuala bikaina: laburra, argia, erakargarria eta edukia azpimarratzen duena.' },
+                ]
+              },
+              {
+                id: '2.5.2b',
+                title: 'Ahozko adierazpena: ahotsa, erritmoa eta segurtasuna',
+                levels: [
+                  { lbl: 'Hasiera', txt: 'Ahotsa ez da entzuten, erritmoa oso azkar/motel, segurtasun falta nabaria.' },
+                  { lbl: 'Garatzen', txt: 'Orokorrean ulergarria baina badira erritmoan edo bolumenean arazo nabariak.' },
+                  { lbl: 'Bereganatua', txt: 'Ahozko adierazpena egokia da: bolumena, erritmoa eta segurtasuna onargarriak.' },
+                  { lbl: 'Aurreratua', txt: 'Ahozko komunikazioa naturala, segurua eta erakargarria. Entzulearengan eragina du.' },
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+
+};
+
+// ═══════════════════════════════════════════════
+// RUBRIC PANEL FUNCTIONS
+// ═══════════════════════════════════════════════
+// ── rubric state ──────────────────────────────
+// rubLevels[ieId][actKey][si][subId] = 1-4
+const rubLevels = {};
+IKAS_EGOERAS.forEach(ie=>{ rubLevels[ie.id] = {}; });
+
+let currentRubricIeId  = null;
+let currentRubricAct   = null;
+let currentRubricSi    = 0;   // selected student index
+
+// level → nota (linear)
+const LVL_TO_NOTA = {1:2.5, 2:5, 3:7.5, 4:10};
+
+// ── helpers ───────────────────────────────────
+function getRubLevels(ieId, actKey){
+  if(!rubLevels[ieId][actKey]) rubLevels[ieId][actKey] = STUDENTS.map(()=>({}));
+  return rubLevels[ieId][actKey];
+}
+
+function calcRubNota(ieId, actKey, si){
+  const act = RUBRICAS[ieId]?.actividades[actKey];
+  if(!act) return null;
+  const levels = getRubLevels(ieId, actKey)[si] || {};
+  // collect all sub ids
+  const subs = act.indicadores.flatMap(ind => ind.subs.map(s => s.id));
+  const vals = subs.map(id => levels[id] ? LVL_TO_NOTA[levels[id]] : null).filter(v => v !== null);
+  if(!vals.length) return null;
+  return vals.reduce((a,b)=>a+b,0) / vals.length;
+}
+
+function applyRubNotaToTable(ieId, actKey, si){
+  const nota = calcRubNota(ieId, actKey, si);
+  if(nota === null) return;
+  // find the input cell for this actKey in the table and set its value
+  const row = document.querySelector(`#tbody-${ieId} tr:nth-child(${si+1})`);
+  if(!row) return;
+  // actKey maps to the input key: ie22→a22a+a22b is handled differently
+  // for rubric-driven activities we write directly to the IE cell key
+  // actKey is 'ie22','ie23','ie25' — map to the raw input keys used in ieData
+  const actInputMap = {
+    'ie22': ['a22a','a22b'],
+    'ie23': ['a23a','a23b'],
+    'ie25': ['a25'],
+    'ie51': ['a51a','a51b'],
+    'ie52': ['a52'],
+    'ie54': ['a54a','a54b'],
+  };
+  const keys = actInputMap[actKey];
+  if(!keys) return;
+  // Set all sub-inputs to the same nota (equal weight already applied at rubric level)
+  keys.forEach(k=>{
+    ieData[ieId][si][k] = Math.round(nota * 10) / 10;
+  });
+  recalc(ieId, si);
+  // update visible inputs if table is built
+  const inputs = row.querySelectorAll('input.g');
+  // inputs order matches COLS_STD order — find by rebuilding index
+  const ie = IKAS_EGOERAS.find(x=>x.id===ieId);
+  let inpIdx = 0;
+  ie.cols.forEach(col=>{
+    if(col.type==='inp'){
+      if(keys.includes(col.key)){
+        const inp = inputs[inpIdx];
+        if(inp){ inp.value = Math.round(nota*10)/10; inp.classList.add('filled'); }
+      }
+      inpIdx++;
+    }
+  });
+}
+
+// ── save/load rubric levels in localStorage ───
+function saveRubLevels(){
+  try {
+    const payload = {};
+    IKAS_EGOERAS.forEach(ie=>{
+      payload[ie.id] = {};
+      Object.entries(rubLevels[ie.id]).forEach(([actKey, rows])=>{
+        payload[ie.id][actKey] = rows.map(r=>({...r}));
+      });
+    });
+    localStorage.setItem('ikas_rub_levels_v1', JSON.stringify(payload));
+  } catch(e){ console.warn('rubric save failed', e); }
+}
+
+function loadRubLevels(){
+  try {
+    const raw = localStorage.getItem('ikas_rub_levels_v1');
+    if(!raw) return;
+    const payload = JSON.parse(raw);
+    IKAS_EGOERAS.forEach(ie=>{
+      if(!payload[ie.id]) return;
+      Object.entries(payload[ie.id]).forEach(([actKey, rows])=>{
+        rubLevels[ie.id][actKey] = STUDENTS.map((_, si) => rows[si] ? {...rows[si]} : {});
+      });
+    });
+  } catch(e){ console.warn('rubric load failed', e); }
+}
+
+// ── panel open/close ──────────────────────────
+function openRubricPanel(ieId){
+  const overlay = document.getElementById('rubric-overlay');
+  const panel   = document.getElementById('rubric-panel');
+  currentRubricIeId = ieId;
+  const rubData = ieId ? RUBRICAS[ieId] : null;
+
+  document.getElementById('rpanel-title').textContent = rubData ? rubData.name + ' — Errubrikak' : 'Errubrika';
+  document.getElementById('rpanel-sub').textContent   = rubData ? '' : 'Ikas-egoera honentzat errubrikarik ez dago oraindik';
+
+  if(rubData){
+    const acts    = Object.entries(rubData.actividades);
+    const firstKey = acts[0][0];
+    // student selector + activity buttons + content area
+    let html = '';
+    // student selector
+    html += `<div style="margin-bottom:10px;">
+      <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px;">Ikaslea hautatu</div>
+      <select id="rub-student-sel" onchange="onRubStudentChange()" style="font-family:'DM Sans',sans-serif;font-size:.82rem;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;width:100%;outline:none;background:var(--surface);">
+        ${STUDENTS.map((name,si)=>`<option value="${si}">${name}</option>`).join('')}
+      </select>
+    </div>`;
+    // activity buttons
+    html += `<div style="margin-bottom:12px;">
+      <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px;">Jarduera</div>`;
+    acts.forEach(([key, act])=>{
+      html += `<button class="rub-act-btn${key===firstKey?' active':''}" id="rbtn-${key}" onclick="showRubricAct('${ieId}','${key}')">${act.label}</button>`;
+    });
+    html += `</div><div id="rubric-act-content"></div>`;
+    document.getElementById('rpanel-body').innerHTML = html;
+    currentRubricSi = 0;
+    showRubricAct(ieId, firstKey);
+  } else {
+    document.getElementById('rpanel-body').innerHTML = `<div class="rpanel-placeholder"><div class="big">📋</div><p>Ikas-egoera honentzat errubrikarik ez dago oraindik.</p></div>`;
+  }
+
+  overlay.classList.add('open');
+  panel.classList.add('open');
+}
+
+function onRubStudentChange(){
+  const sel = document.getElementById('rub-student-sel');
+  if(!sel) return;
+  currentRubricSi = parseInt(sel.value);
+  if(currentRubricIeId && currentRubricAct)
+    showRubricAct(currentRubricIeId, currentRubricAct);
+}
+
+function showRubricAct(ieId, actKey){
+  currentRubricAct = actKey;
+  currentRubricIeId = ieId;
+  const act = RUBRICAS[ieId]?.actividades[actKey];
+  if(!act) return;
+
+  document.querySelectorAll('.rub-act-btn').forEach(b=>{
+    b.classList.toggle('active', b.id === 'rbtn-'+actKey);
+  });
+  document.getElementById('rpanel-sub').textContent = act.ke + ' · ' + act.marco;
+
+  const si       = currentRubricSi;
+  const levels   = getRubLevels(ieId, actKey)[si] || {};
+  const rubNota  = calcRubNota(ieId, actKey, si);
+
+  let html = '';
+  if(act.nota){
+    html += `<div class="rub-note">ℹ️ ${act.nota}</div>`;
+  }
+
+  // calculated nota bar
+  html += `<div id="rub-nota-bar" style="background:var(--blue-zebra);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+    <div>
+      <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Errubrikatik kalkulatutako nota</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:2px;">Subindikazioak berdintsu pisatzen dute</div>
+    </div>
+    <div id="rub-nota-display" style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:${colorHex(rubNota)};min-width:48px;text-align:right;">
+      ${rubNota !== null ? rubNota.toFixed(2) : '—'}
+    </div>
+  </div>`;
+
+  act.indicadores.forEach(ind=>{
+    html += `<div class="rub-indicator">
+      <div class="rub-ind-head"><span>${ind.id}</span>${ind.title}</div>`;
+    ind.subs.forEach(sub=>{
+      const sel = levels[sub.id] || 0;
+      html += `<div class="rub-sub">
+        <div class="rub-sub-title">${sub.id} — ${sub.title}</div>
+        <div class="rub-levels">`;
+      sub.levels.forEach((lv, i)=>{
+        const lvNum  = i + 1;
+        const active = sel === lvNum;
+        html += `<div class="rub-level lvl-${lvNum}${active?' rub-level-sel':''}"
+          style="cursor:pointer;${active?'outline:2px solid currentColor;outline-offset:1px;font-weight:600;':''}"
+          onclick="selectRubLevel('${ieId}','${actKey}',${si},'${sub.id}',${lvNum})">
+          <div class="rub-level-lbl">${lv.lbl}${active?' ✓':''}</div>
+          ${lv.txt}
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  });
+
+  document.getElementById('rubric-act-content').innerHTML = html;
+}
+
+function selectRubLevel(ieId, actKey, si, subId, lvNum){
+  const rows = getRubLevels(ieId, actKey);
+  if(!rows[si]) rows[si] = {};
+  // toggle off if same level clicked again
+  if(rows[si][subId] === lvNum){
+    delete rows[si][subId];
+  } else {
+    rows[si][subId] = lvNum;
+  }
+  // recalculate and push to table
+  applyRubNotaToTable(ieId, actKey, si);
+  saveRubLevels();
+  // refresh panel display
+  showRubricAct(ieId, actKey);
+}
+
+function closeRubricPanel(){
+  document.getElementById('rubric-overlay').classList.remove('open');
+  document.getElementById('rubric-panel').classList.remove('open');
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeRubricPanel(); });
 
 // Load saved data, then render
 loadFromStorage();
