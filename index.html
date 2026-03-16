@@ -338,6 +338,52 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
 .help-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:.75rem;font-weight:700;cursor:help;border:1px solid rgba(255,255,255,.3);flex-shrink:0;}
 .help-badge::after{bottom:auto;top:calc(100% + 8px);}
 .help-badge::before{bottom:auto;top:calc(100% + 2px);border-top-color:transparent;border-bottom-color:#1e2d3d;}
+
+/* ── ACNEAE ── */
+.acneae-badge{display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;font-size:.58rem;font-weight:700;padding:1px 5px;letter-spacing:.03em;vertical-align:middle;margin-left:4px;}
+.acneae-toggle{background:none;border:1px solid #e0c060;color:#856404;border-radius:4px;font-size:.65rem;font-weight:700;padding:1px 6px;cursor:pointer;flex-shrink:0;transition:background .12s;}
+.acneae-toggle:hover{background:#fff3cd;}
+.acneae-toggle.on{background:#ffc107;color:#7a5200;border-color:#e0a800;}
+.student-chip.is-acneae .student-chip-name{font-weight:600;}
+
+/* ── OBSERVATIONS ── */
+.obs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:24px;}
+.obs-card{background:var(--surface);border-radius:9px;border:1px solid var(--border);overflow:hidden;}
+.obs-card-head{background:var(--blue-hdr);color:#fff;padding:8px 12px;font-size:.78rem;font-weight:600;}
+.obs-card-body{padding:8px 10px;}
+.obs-ie-lbl{font-size:.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px;}
+.obs-textarea{font-family:'DM Sans',sans-serif;font-size:.75rem;border:1.5px solid var(--border);border-radius:5px;padding:5px 8px;resize:vertical;min-height:54px;outline:none;width:100%;transition:border-color .15s;}
+.obs-textarea:focus{border-color:var(--blue-mid);}
+.obs-student-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+
+/* ── PRINT / PDF ── */
+@media print{
+  body>*{display:none!important;}
+  #print-area{display:block!important;position:static!important;}
+  @page{margin:1.5cm;size:A4;}
+}
+#print-area{display:none;}
+.pdf-header{border-bottom:2px solid #4A6FA5;padding-bottom:10px;margin-bottom:16px;}
+.pdf-header h2{font-size:1.15rem;font-weight:700;color:#4A6FA5;margin-bottom:3px;}
+.pdf-header p{font-size:.75rem;color:#7a8899;}
+.pdf-section{margin-bottom:14px;}
+.pdf-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a8899;border-bottom:1px solid #dde3ee;padding-bottom:3px;margin-bottom:7px;}
+.pdf-notas-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-bottom:6px;}
+.pdf-notas-table th{background:#4A6FA5;color:#fff;padding:5px 8px;text-align:left;font-weight:500;}
+.pdf-notas-table th:not(:first-child){text-align:center;}
+.pdf-notas-table td{padding:5px 8px;border-bottom:1px solid #dde3ee;}
+.pdf-notas-table td:not(:first-child){text-align:center;font-family:monospace;}
+.pdf-notas-table tr:nth-child(even) td{background:#eef4f9;}
+.pdf-rub-block{background:#f4f6fb;border-radius:6px;padding:8px 10px;margin-bottom:8px;}
+.pdf-rub-block h4{font-size:.73rem;font-weight:600;color:#4A6FA5;margin-bottom:5px;}
+.pdf-rub-sub{margin-bottom:5px;font-size:.71rem;}
+.pdf-rub-sub-title{font-weight:600;color:#1e2d3d;margin-bottom:2px;}
+.pdf-lvl-pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;margin-right:4px;}
+.lvlp-1{background:#fde8e8;color:#c0392b;}
+.lvlp-2{background:#fef9e7;color:#b7860b;}
+.lvlp-3{background:#e8f8ef;color:#1e7e4a;}
+.lvlp-4{background:#e8f0ff;color:#2a4a8a;}
+.pdf-obs{background:#fffbea;border-left:3px solid #ffc107;padding:5px 9px;font-size:.72rem;color:#555;border-radius:0 5px 5px 0;margin-top:3px;}
 </style>
 </head>
 <body>
@@ -355,6 +401,7 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
     <span class="crumb active" onclick="goHome()">Hasiera</span>
   </div>
   <div class="topbar-right" id="topbar-right">
+    <button class="btn btn-white btn-sm" id="btn-obs" onclick="openObs()" style="display:none">📝 Oharrak</button>
     <button class="btn btn-white btn-sm" onclick="openRubricPanel(currentIeId)">📋 Errubrika</button>
     <button class="btn btn-grn btn-sm" onclick="exportCSV()">↓ CSV</button>
   </div>
@@ -363,7 +410,10 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
 <!-- hidden textarea for iOS copy fallback -->
 <textarea id="csv-area" readonly></textarea>
 
-<!-- ══ CELL POPOVER ══ -->
+<!-- ══ PRINT AREA ══ -->
+<div id="print-area"></div>
+
+<!-- ══ OBSERVATIONS VIEW (injected into .content) ══ --><!-- ══ CELL POPOVER ══ -->
 <div id="cell-popover">
   <div class="cpop-head">
     <div class="cpop-head-info">
@@ -442,6 +492,22 @@ input.g.filled{background:var(--peach);border-color:var(--orange);}
   <!-- ══ IE DETAIL (rendered dynamically) ══ -->
   <div id="view-ie" class="view"></div>
 
+  <!-- ══ OBSERVATIONS ══ -->
+  <div id="view-obs" class="view">
+    <div class="ie-detail-header">
+      <div>
+        <h2 id="obs-title">Oharrak</h2>
+        <p>Ikasle bakoitzeko oharrak ikas-egoeraka</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-grn btn-sm" id="obs-pdf-btn" onclick="printStudentReport(obsCurrentSi)">↓ PDF</button>
+        <button class="btn btn-sec btn-sm" onclick="goHome()">← Itzuli</button>
+      </div>
+    </div>
+    <div class="obs-student-tabs" id="obs-student-tabs"></div>
+    <div id="obs-content"></div>
+  </div>
+
   <!-- ══ FINAL ══ -->
   <div id="view-final" class="view">
     <div class="ie-detail-header">
@@ -517,6 +583,13 @@ const ieCells = {};
 IKAS_EGOERAS.forEach(ie=>{
   ieData[ie.id] = STUDENTS.map(()=>({}));
   ieCells[ie.id] = STUDENTS.map(()=>({}));
+});
+
+// ── ACNEAE & OBSERVATIONS ─────────────────────
+const studentACNEAE = {};            // si → true
+const observations  = {};            // ieId → [si] → string
+IKAS_EGOERAS.forEach(ie=>{
+  observations[ie.id] = STUDENTS.map(()=>'');
 });
 
 let currentIeId = null;
@@ -897,12 +970,24 @@ function renderStudentList(){
   const grid=document.getElementById('student-list-grid');
   grid.innerHTML='';
   STUDENTS.forEach((name,si)=>{
+    const isA=!!studentACNEAE[si];
     const div=document.createElement('div');
-    div.className='student-chip';
-    div.innerHTML=`<span class="student-chip-name">${name}</span><button onclick="removeStudent(${si})" title="Ezabatu">×</button>`;
+    div.className='student-chip'+(isA?' is-acneae':'');
+    div.innerHTML=`
+      <button class="acneae-toggle${isA?' on':''}" onclick="toggleACNEAE(${si})" title="ACNEAE marka">A</button>
+      <span class="student-chip-name">${name}${isA?'<span class="acneae-badge">ACNEAE</span>':''}</span>
+      <button onclick="removeStudent(${si})" title="Ezabatu" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:.9rem;padding:0 2px;line-height:1;flex-shrink:0;">×</button>`;
     grid.appendChild(div);
   });
   document.getElementById('student-count-label').textContent=STUDENTS.length+' ikasle';
+}
+
+function toggleACNEAE(si){
+  studentACNEAE[si]=!studentACNEAE[si];
+  if(!studentACNEAE[si]) delete studentACNEAE[si];
+  renderStudentList();
+  saveToStorage();
+  toast(STUDENTS[si]+': ACNEAE '+(studentACNEAE[si]?'aktibatuta ✓':'desaktibatuta'));
 }
 
 function addStudent(){
@@ -913,23 +998,36 @@ function addStudent(){
   IKAS_EGOERAS.forEach(ie=>{
     ieData[ie.id].push({});
     ieCells[ie.id].push({});
+    observations[ie.id].push('');
   });
   inp.value='';
   renderStudentList();
   if(currentIeId) buildTable(currentIeId);
+  saveToStorage();
   toast(name+' gehitu da ✓');
 }
 
 function removeStudent(si){
   if(!confirm(STUDENTS[si]+' ezabatu nahi duzu? Nota guztiak galduko dira.')) return;
   STUDENTS.splice(si,1);
+  // re-index ACNEAE
+  const newA={};
+  Object.entries(studentACNEAE).forEach(([k,v])=>{
+    const ki=parseInt(k);
+    if(ki<si) newA[ki]=v;
+    else if(ki>si) newA[ki-1]=v;
+  });
+  Object.keys(studentACNEAE).forEach(k=>delete studentACNEAE[k]);
+  Object.assign(studentACNEAE,newA);
   IKAS_EGOERAS.forEach(ie=>{
     ieData[ie.id].splice(si,1);
     ieCells[ie.id].splice(si,1);
+    observations[ie.id].splice(si,1);
   });
   renderStudentList();
   if(currentIeId) buildTable(currentIeId);
   IKAS_EGOERAS.forEach(ie=>refreshHomeCard(ie.id));
+  saveToStorage();
   toast('Ikaslea ezabatu da.');
 }
 
@@ -946,6 +1044,7 @@ function goHome(){
   showView('home');
   document.getElementById('breadcrumb').innerHTML=`<span class="crumb active">Hasiera</span>`;
   document.getElementById('topbar-right').style.display='none';
+  document.getElementById('btn-obs').style.display='none';
 }
 
 function openIE(ieId){
@@ -1101,6 +1200,7 @@ function openIE(ieId){
     <span class="sep">›</span>
     <span class="crumb active">IE${idx} — ${ie.name}</span>`;
   document.getElementById('topbar-right').style.display='flex';
+  document.getElementById('btn-obs').style.display='inline-flex';
 }
 
 function switchSubTab(ieId,tab){
@@ -1231,20 +1331,22 @@ function buildFinalView(){
     <div class="stat"><div class="sl">IE ebaluatuak</div><div class="sv">${IKAS_EGOERAS.filter(ie=>STUDENTS.some((_,si)=>ieData[ie.id][si]['_azken']!=null)).length}/9</div></div>`;
 
   const thead=document.getElementById('final-thead');
-  thead.innerHTML=`<th>#</th><th>Ikaslea</th>${IKAS_EGOERAS.map((ie,i)=>`<th>IE${i+1}<br><small style="font-weight:400;opacity:.75">${ie.name}</small></th>`).join('')}<th>Batez bestekoa</th><th>Egoera</th>`;
+  thead.innerHTML=`<th>#</th><th>Ikaslea</th>${IKAS_EGOERAS.map((ie,i)=>`<th>IE${i+1}<br><small style="font-weight:400;opacity:.75">${ie.name}</small></th>`).join('')}<th>Batez bestekoa</th><th>Egoera</th><th></th>`;
 
   const tbody=document.getElementById('final-tbody');
   tbody.innerHTML='';
-  rows.forEach(({name,notas,avg},rank)=>{
+  rows.forEach(({name,si,notas,avg},rank)=>{
     const rankLabel=`<span class="rank-num">${rank+1}</span>`;
+    const isA=!!studentACNEAE[si];
     let badge='—';
     if(avg!=null) badge=avg>=6?`<span style="background:var(--pass-bg);color:var(--pass-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Gaindituta</span>`:avg>=5?`<span style="background:var(--warn-bg);color:var(--warn-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Mugan</span>`:`<span style="background:var(--fail-bg);color:var(--fail-tx);padding:2px 9px;border-radius:16px;font-size:.69rem;font-weight:600">Gutxi gainditu</span>`;
     const tr=document.createElement('tr');
     tr.innerHTML=`<td style="text-align:center">${rankLabel}</td>
-      <td style="font-weight:500;font-size:.83rem">${name}</td>
+      <td style="font-weight:500;font-size:.83rem">${name}${isA?'<span class="acneae-badge">ACNEAE</span>':''}</td>
       ${notas.map(v=>`<td><span style="color:${colorHex(v)};font-family:'DM Mono',monospace">${nStr(v)}</span></td>`).join('')}
       <td><span style="font-size:.92rem;font-weight:700;color:${colorHex(avg)};font-family:'DM Mono',monospace">${nStr(avg)}</span></td>
-      <td>${badge}</td>`;
+      <td>${badge}</td>
+      <td><button onclick="printStudentReport(${si})" style="background:var(--green-pale);border:1px solid var(--green-mid);color:#2d5a3d;border-radius:5px;font-size:.68rem;padding:3px 8px;cursor:pointer;white-space:nowrap;">↓ PDF</button></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -1323,7 +1425,6 @@ const LS_KEY = 'ikas_egoera_data_v1';
 
 function saveToStorage(){
   try {
-    // Only save raw input values (not computed _keys), plus students and meta
     const payload = {
       students: STUDENTS,
       meta: {
@@ -1332,7 +1433,9 @@ function saveToStorage(){
         ira: document.getElementById('m-ira').value,
       },
       grades: {},
-      rubLevelsData: {}
+      rubLevelsData: {},
+      acneae: {},
+      obs: {}
     };
     IKAS_EGOERAS.forEach(ie=>{
       payload.grades[ie.id] = STUDENTS.map((_,si)=>{
@@ -1343,12 +1446,13 @@ function saveToStorage(){
         });
         return out;
       });
-      // save rubric levels per activity
       payload.rubLevelsData[ie.id] = {};
       Object.entries(rubLevels[ie.id]).forEach(([actKey, rows])=>{
         payload.rubLevelsData[ie.id][actKey] = rows.map(r=>({...r}));
       });
+      payload.obs[ie.id] = (observations[ie.id]||[]).map(v=>v||'');
     });
+    STUDENTS.forEach((_,si)=>{ if(studentACNEAE[si]) payload.acneae[si]=true; });
     localStorage.setItem(LS_KEY, JSON.stringify(payload));
     showSaveIndicator();
   } catch(e){ console.warn('localStorage save failed', e); }
@@ -1366,8 +1470,9 @@ function loadFromStorage(){
       payload.students.forEach(s=>STUDENTS.push(s));
       // Resize ieData/ieCells arrays to match
       IKAS_EGOERAS.forEach(ie=>{
-        ieData[ie.id] = STUDENTS.map(()=>({}));
-        ieCells[ie.id] = STUDENTS.map(()=>({}));
+        ieData[ie.id]       = STUDENTS.map(()=>({}));
+        ieCells[ie.id]      = STUDENTS.map(()=>({}));
+        observations[ie.id] = STUDENTS.map(()=>'');
       });
     }
 
@@ -1399,6 +1504,19 @@ function loadFromStorage(){
         Object.entries(savedRub).forEach(([actKey, rows])=>{
           rubLevels[ie.id][actKey] = STUDENTS.map((_,si) => rows[si] ? {...rows[si]} : {});
         });
+      });
+    }
+
+    // Restore ACNEAE
+    if(payload.acneae){
+      Object.entries(payload.acneae).forEach(([k,v])=>{ if(v) studentACNEAE[parseInt(k)]=true; });
+    }
+
+    // Restore observations
+    if(payload.obs){
+      IKAS_EGOERAS.forEach(ie=>{
+        if(!payload.obs[ie.id]) return;
+        observations[ie.id] = STUDENTS.map((_,si)=>payload.obs[ie.id][si]||'');
       });
     }
 
@@ -1900,6 +2018,173 @@ function closeRubricPanel(){
 }
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeRubricPanel(); });
+
+// ═══════════════════════════════════════════════
+// OBSERVATIONS VIEW
+// ═══════════════════════════════════════════════
+let obsCurrentSi = 0;
+
+function openObs(){
+  obsCurrentSi = 0;
+  showView('obs');
+  document.getElementById('topbar-right').style.display='flex';
+  document.getElementById('btn-obs').style.display='inline-flex';
+  document.getElementById('breadcrumb').innerHTML=`
+    <span class="crumb" onclick="goHome()">Hasiera</span>
+    <span class="sep">›</span>
+    <span class="crumb active">📝 Oharrak</span>`;
+  renderObsTabs();
+  renderObsContent(0);
+}
+
+function renderObsTabs(){
+  const tabs=document.getElementById('obs-student-tabs');
+  tabs.innerHTML='';
+  STUDENTS.forEach((name,si)=>{
+    const isA=!!studentACNEAE[si];
+    const btn=document.createElement('button');
+    btn.className='btn btn-sm '+(si===obsCurrentSi?'btn-grn':'btn-sec');
+    btn.style.cssText='display:inline-flex;align-items:center;gap:4px;';
+    btn.innerHTML=name+(isA?'<span class="acneae-badge" style="color:#856404;background:#fff3cd;">A</span>':'');
+    btn.onclick=()=>{ obsCurrentSi=si; renderObsTabs(); renderObsContent(si); };
+    tabs.appendChild(btn);
+  });
+}
+
+function renderObsContent(si){
+  const isA=!!studentACNEAE[si];
+  document.getElementById('obs-title').textContent=
+    STUDENTS[si]+(isA?' · ACNEAE':'');
+  document.getElementById('obs-pdf-btn').onclick=()=>printStudentReport(si);
+
+  let html='<div class="obs-grid">';
+  IKAS_EGOERAS.forEach((ie,idx)=>{
+    const val=(observations[ie.id]||[])[si]||'';
+    const azk=ieData[ie.id][si]['_azken'];
+    const notaStr=azk!=null?`<span style="font-family:'DM Mono',monospace;font-size:.75rem;font-weight:700;color:${colorHex(azk)};margin-left:6px;">${azk.toFixed(2)}</span>`:'';
+    html+=`<div class="obs-card">
+      <div class="obs-card-head">
+        <span>IE${idx+1} — ${ie.name}${notaStr}</span>
+      </div>
+      <div class="obs-card-body">
+        <label class="obs-ie-lbl">Oharrak / Iruzkinak</label>
+        <textarea class="obs-textarea" rows="3"
+          oninput="saveObs('${ie.id}',${si},this.value)"
+          placeholder="Ohar edo iruzkinak idatzi hemen…">${val}</textarea>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('obs-content').innerHTML=html;
+}
+
+function saveObs(ieId,si,val){
+  if(!observations[ieId]) observations[ieId]=STUDENTS.map(()=>'');
+  observations[ieId][si]=val;
+  saveToStorage();
+}
+
+// ═══════════════════════════════════════════════
+// PDF TXOSTENA — print per student
+// ═══════════════════════════════════════════════
+const LVL_NAMES={1:'Hasiera',2:'Garatzen',3:'Bereganatua',4:'Aurreratua'};
+const LVL_CLS  ={1:'lvlp-1', 2:'lvlp-2', 3:'lvlp-3',     4:'lvlp-4'};
+
+function printStudentReport(si){
+  const name  = STUDENTS[si];
+  const isA   = !!studentACNEAE[si];
+  const maila = document.getElementById('m-maila').value||'—';
+  const ik    = document.getElementById('m-ik').value||'—';
+  const ira   = document.getElementById('m-ira').value||'—';
+
+  let html=`<div class="pdf-header">
+    <h2>${name}${isA?' &nbsp;<span style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;font-size:.7rem;padding:1px 6px;font-weight:700;">ACNEAE</span>':''}</h2>
+    <p>Maila: ${maila} &nbsp;|&nbsp; Ikasturte: ${ik} &nbsp;|&nbsp; Irakaslea: ${ira} &nbsp;|&nbsp; Data: ${new Date().toLocaleDateString('eu')}</p>
+  </div>`;
+
+  // Notak laburpen taula
+  html+=`<div class="pdf-section">
+    <div class="pdf-section-title">Azken Notak — Ikas-egoera guztiak</div>
+    <table class="pdf-notas-table">
+      <thead><tr><th>Ikas-egoera</th><th>KE2 (50%)</th><th>KE5 (50%)</th><th>Azken Nota</th></tr></thead>
+      <tbody>`;
+  IKAS_EGOERAS.forEach((ie,idx)=>{
+    const d=ieData[ie.id][si];
+    const f=k=>d['_'+k]!=null?d['_'+k].toFixed(2):'—';
+    const azk=d['_azken'];
+    const col=azk!=null?(azk>=6?'#1e7e4a':azk>=5?'#b7860b':'#c0392b'):'#aaa';
+    html+=`<tr>
+      <td>IE${idx+1} — ${ie.name}</td>
+      <td>${f('ce2')}</td><td>${f('ce5')}</td>
+      <td style="font-weight:700;color:${col};">${f('azken')}</td>
+    </tr>`;
+  });
+  // global average
+  const allAzk=IKAS_EGOERAS.map(ie=>ieData[ie.id][si]['_azken']).filter(x=>x!=null);
+  const globalAvg=allAzk.length?allAzk.reduce((a,b)=>a+b,0)/allAzk.length:null;
+  if(globalAvg!=null){
+    const col=globalAvg>=6?'#1e7e4a':globalAvg>=5?'#b7860b':'#c0392b';
+    html+=`<tr style="background:#eef4f9;font-weight:700;">
+      <td>Batez bestekoa orokorra</td><td>—</td><td>—</td>
+      <td style="color:${col};font-weight:700;">${globalAvg.toFixed(2)}</td>
+    </tr>`;
+  }
+  html+=`</tbody></table></div>`;
+
+  // Errubrika mailak
+  IKAS_EGOERAS.forEach((ie,idx)=>{
+    const rubData=RUBRICAS[ie.id];
+    if(!rubData) return;
+    const actEntries=Object.entries(rubData.actividades);
+    const hasData=actEntries.some(([actKey])=>{
+      const rows=rubLevels[ie.id]?.[actKey];
+      return rows&&rows[si]&&Object.keys(rows[si]).length>0;
+    });
+    if(!hasData) return;
+    html+=`<div class="pdf-section">
+      <div class="pdf-section-title">IE${idx+1} — ${ie.name} · Errubrika Mailak</div>`;
+    actEntries.forEach(([actKey,act])=>{
+      const rows=rubLevels[ie.id]?.[actKey];
+      if(!rows||!rows[si]||!Object.keys(rows[si]).length) return;
+      const levels=rows[si];
+      html+=`<div class="pdf-rub-block"><h4>${act.label}</h4>`;
+      act.indicadores.forEach(ind=>{
+        ind.subs.forEach(sub=>{
+          const lv=levels[sub.id]; if(!lv) return;
+          const lvTxt=sub.levels[lv-1]?.txt||'';
+          html+=`<div class="pdf-rub-sub">
+            <div class="pdf-rub-sub-title">${sub.id} — ${sub.title}</div>
+            <span class="pdf-lvl-pill ${LVL_CLS[lv]}">${LVL_NAMES[lv]}</span>
+            <span style="color:#555;">${lvTxt}</span>
+          </div>`;
+        });
+      });
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+
+  // Oharrak
+  const hasObs=IKAS_EGOERAS.some(ie=>(observations[ie.id]||[])[si]?.trim());
+  if(hasObs){
+    html+=`<div class="pdf-section"><div class="pdf-section-title">Oharrak</div>`;
+    IKAS_EGOERAS.forEach((ie,idx)=>{
+      const obs=(observations[ie.id]||[])[si];
+      if(!obs?.trim()) return;
+      html+=`<div style="margin-bottom:8px;">
+        <strong style="font-size:.72rem;color:#4A6FA5;">IE${idx+1} — ${ie.name}</strong>
+        <div class="pdf-obs">${obs.replace(/\n/g,'<br>')}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  const area=document.getElementById('print-area');
+  area.innerHTML=html;
+  area.style.display='block';
+  window.print();
+  setTimeout(()=>{ area.style.display='none'; },1500);
+}
 
 // Load saved data, then render
 loadFromStorage();
